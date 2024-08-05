@@ -39,13 +39,22 @@ impl fmt::Display for BMSReadError {
 ///
 /// bms파일, 인코딩 입력한 값 -> data
 ///
+/// |                          bms file                          |     |    mets file    |
+/// | :--------------------------------------------------------: | :-: | :-------------: |
+/// |                        hash value?                         |     | mets::ID, OBJID |
+/// | files(BMP, WAV, STAGEFILE, BANNER, BACKBMP, CHARFILE, ...) |     |     fileSec     |
+///
 ///
 ///
 
 pub fn read_bms_file(bms_path: &str, encoding_name: &str) -> Result<(), BMSReadError> {
     use encoding_rs::Encoding;
-    use std::io::Write;
     use log::debug;
+    use std::io::Write;
+
+    // 입력한 인코딩 이름으로 인코딩 정의
+    let encoding: &Encoding =
+        Encoding::for_label(encoding_name.as_bytes()).unwrap_or_else(|| encoding_rs::UTF_8);
 
     // 경로에 있는 파일이 유효한지 확인
     let mut bms_file = match fs::File::open(bms_path) {
@@ -60,28 +69,25 @@ pub fn read_bms_file(bms_path: &str, encoding_name: &str) -> Result<(), BMSReadE
     };
 
     debug!("{:?}", bms_file);
-    let encoding: &Encoding =
-        Encoding::for_label(encoding_name.as_bytes()).unwrap_or_else(|| encoding_rs::UTF_8);
 
     let file_size = match bms_file.metadata() {
         Err(error) => {
             debug!("fail getting file size, {}", error);
             return Err(BMSReadError::FailToReadFile(String::from(bms_path)));
         }
-        Ok(metadata) => {
-            metadata.len() as usize
-        }
+        Ok(metadata) => metadata.len() as usize,
     };
 
-    //
+    // 파일 읽고 인코딩에 따라 디코딩
     let mut buffer: Vec<u8> = vec![0; file_size];
 
     bms_file.read_to_end(&mut buffer).expect("fail to read");
 
     let (cow, encoding_used, had_errors) = encoding.decode(&buffer);
 
+    // 디코딩한 결과에 따라 error, metadata 반환
     if had_errors {
-        println!("error , { }", encoding_used.name());
+        debug!("error , { }", encoding_used.name());
         Err(BMSReadError::IncorrectEncoding(
             String::from(bms_path),
             String::from(encoding_name),
@@ -89,11 +95,12 @@ pub fn read_bms_file(bms_path: &str, encoding_name: &str) -> Result<(), BMSReadE
         ))
     } else {
         use regex::Regex;
-        let name_regex = Regex::new(r"[^/]*$").expect("wow");
+        let name_regex = Regex::new(r"([^/]*)\.[^/]*$").expect("wow");
+        debug!("{:?}", name_regex.captures(bms_path));
         let Some(file_name) = name_regex.captures(bms_path) else {
-            return Err(BMSReadError::FailToReadFile(String::from("regex error")))
+            return Err(BMSReadError::FailToReadFile(String::from("regex error")));
         };
-        let output_file_path = format!("./test_resource/result/{}", &file_name[0]);
+        let output_file_path = format!("./test_resource/result/{}.readed", &file_name[1]);
         let mut out_put = match fs::File::create_new(&output_file_path) {
             Ok(file) => file,
             Err(_) => return Err(BMSReadError::FailToReadFile(output_file_path.clone())),
