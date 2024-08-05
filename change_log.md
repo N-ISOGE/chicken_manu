@@ -15,26 +15,40 @@
 ##### 2024-07-11
 
 - idx 환경 파일 작성
-  - rust랑 markup 언어 관련 설정
+    - rust랑 markup 언어 관련 설정
 - readme, log 작성
-  - 기본적인 기록 작성
+    - 기본적인 기록 작성
 
 ## 의미 기반 기록
 
 ### 참고할 것들
 
-- [METS]
+#### [METS]
 
-  - 스키마 참고
+- 스키마 참고
 
-- [IPFS]
+#### [IPFS]
 
-  - 배포 및 공유 기반
+- 배포 및 공유 기반
 
-- [IPFS] 구현
-  - [iroh](https://iroh.computer/docs)
+**[IPFS] 구현**
+
+- [iroh](https://iroh.computer/docs)
     - [iroh-rust](https://crates.io/crates/iroh)
-  - [rust-ipfs](https://crates.io/crates/rust-ipfs)
+- [rust-ipfs](https://crates.io/crates/rust-ipfs)
+
+#### BMS
+
+**여러 사양**
+
+[hitkey](https://hitkey.nekokan.dyndns.info/cmds.htm)
+
+- [archive](https://web.archive.org/web/20240505175610/https://hitkey.nekokan.dyndns.info/cmds.htm)
+
+**관련 도구 및 구동기**
+
+
 
 [IPFS]: https://docs.ipfs.tech/
+
 [METS]: https://www.loc.gov/standards/mets/mets-home.html
