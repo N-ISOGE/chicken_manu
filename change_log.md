@@ -122,6 +122,8 @@ Comment 처리?
 
 - [github](https://github.com/aqtq314/iBMSC)
 
+`source/iBMSC/iBMSC/Form1.vb`에 `Private Sub OpenBMS(String)`에서 읽음.
+
 ##### **μBMSC**
 
 관련 링크
