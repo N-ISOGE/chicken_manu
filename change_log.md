@@ -26,7 +26,7 @@
 
 이거가 있었나? -> BMSSearch  
 이거 남아있긴 한건가? -> ?  
-이 파일이 맞나? -> BMSSearch로는 부족
+이 파일이 맞나? -> BMSSearch로는 부족  
 이거를 뭐라 부르냐 -> 패턴이랑 관련 파일들?
 
 ### 참고할 것들
@@ -72,9 +72,10 @@ bms 파일 하나와 연관된 파일들을 묶어서 관리함.
 
 **파일 정보용 header**
 
-`#WAVXX`, `#EXWAVXX`, `#MIDIFILE`, `#PATH_WAV`(?)  
+`#WAVXX`, `#EXWAVXX`, `#MIDIFILE`  
+`#PATH_WAV`  
 `#BMPXX`, `#EXBMPXX`, `#VIDEOFILE`, `#MOVIE`, `#BACKBMP`, `#CHARFILE`  
-`#STAGEFILE`, `#BANNER`
+`#STAGEFILE`, `#BANNER`  
 
 MATERIAL 계열 header를 쓴 bms가 있나?
 
@@ -122,13 +123,28 @@ Comment 처리?
 
 - [github](https://github.com/aqtq314/iBMSC)
 
-`source/iBMSC/iBMSC/Form1.vb`에 `Private Sub OpenBMS(String)`에서 읽음.
+BGA 대신할 것이 있는 쪽을 지원하는 목적이라 `#BMP`을 뺌.
+
+`source/iBMSC/iBMSC/Form1.vb`
+
+- `Private Sub OpenBMS(ByVal As String)`
+- `Private Function SaveBMS() As String`
+    - 메타데이터 관련: `#TITLE`, `#ARTIST`, `#SUBTITLE`, `#SUBARTIST`
+    - 파일 정보 관련: `#STAGEFILE`, `#BANNER`, `#BACKBMP`, `#WAV`
 
 ##### **μBMSC**
 
 관련 링크
 
 - [github]([https://github.com/zardoru/iBMSC)
+
+iBMSC와 비슷하게 `#BMP`을 뺌
+
+`iBMSC/ChartIO.vb`
+
+- `Private Sub OpenBMS(ByVal As String)`
+    - 메타데이터 관련: `#TITLE`, `#ARTIST`, `#SUBTITLE`, `#SUBARTIST`
+    - 파일 정보 관련: `#STAGEFILE`, `#BANNER`, `#BACKBMP`, `#WAV`
 
 ##### [Beatoraja]
 
