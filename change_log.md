@@ -5,7 +5,7 @@
 ### 스키마 정의하기
 
 - [METS]에서 파생시켜서 메타데이터에 대한 스키마를 직접 최신화하는 부분을 줄임.
-    - xml, encoding은 UTF-8로.
+  - xml, encoding은 UTF-8로.
 
 ### 관리, 공유 및 배포 도구 작성
 
@@ -16,9 +16,9 @@
 ##### 2024-07-11
 
 - idx 환경 파일 작성
-    - rust랑 markup 언어 관련 설정
+  - rust랑 markup 언어 관련 설정
 - readme, log 작성
-    - 기본적인 기록 작성
+  - 기본적인 기록 작성
 
 ## 의미 기반 기록
 
@@ -44,7 +44,7 @@
 **[IPFS] 구현**
 
 - [iroh](https://iroh.computer/docs)
-    - [iroh-rust](https://crates.io/crates/iroh)
+  - [iroh-rust](https://crates.io/crates/iroh)
 - [rust-ipfs](https://crates.io/crates/rust-ipfs)
 
 [IPFS]: https://docs.ipfs.tech/
@@ -62,7 +62,7 @@ bms 파일 하나와 연관된 파일들을 묶어서 관리함.
 과거 기록들: [hitkey 2014 archive]  
 현재 반영: [hitkey 2014 archive]
 
-여러 관련 도구와 구동기들의 사양을 기반으로 정리함.
+여러 관련 도구와 구동기들의 사양을 기반으로 사양을 정리한 문서.
 
 ---
 
@@ -75,7 +75,7 @@ bms 파일 하나와 연관된 파일들을 묶어서 관리함.
 `#WAVXX`, `#EXWAVXX`, `#MIDIFILE`  
 `#PATH_WAV`  
 `#BMPXX`, `#EXBMPXX`, `#VIDEOFILE`, `#MOVIE`, `#BACKBMP`, `#CHARFILE`  
-`#STAGEFILE`, `#BANNER`  
+`#STAGEFILE`, `#BANNER`
 
 MATERIAL 계열 header를 쓴 bms가 있나?
 
@@ -84,8 +84,8 @@ MATERIAL 계열 header를 쓴 bms가 있나?
 header 중복되면 EOL에 가까운, 뒤에 나온 header를 반영함.
 
 - 예외도 있음 :
-    - 메타데이터에선 `#SUBTITLE`, `#SUBARTIST` 등...
-    - 파일 처리에선 고려하지 않음.
+  - 메타데이터에선 `#SUBTITLE`, `#SUBARTIST` 등...
+  - 파일 처리에선 고려하지 않음.
 
 Comment 처리?
 
@@ -93,9 +93,7 @@ Comment 처리?
 
 소리 파일이 다른데 패턴 파일이 같은 경우를 다르게 등록시켜야 할 점.
 
-
 [hitkey BMS command memo]: https://hitkey.nekokan.dyndns.info/cmds.htm
-
 [hitkey 2014 archive]: https://web.archive.org/web/20240505175610/https://hitkey.nekokan.dyndns.info/cmds.htm
 
 #### 관련 도구 및 구동기
@@ -105,12 +103,12 @@ Comment 처리?
 여기서 대응 안하는 header
 
 - 파일 관련
-    - `#BANNER`, `#BACKBMP`, `#EXBMPzz`, `#VIDEOFILE`, `#CHARFILE`
-    - `#MIDIFILE`, `#EXWAVzz`, `#PREVIEW`
-    - `#MATERIALSWAV`, `#MATERIALSBMP`, `#PATH_WAV`
-    - `#CDDA`
+  - `#BANNER`, `#BACKBMP`, `#EXBMPzz`, `#VIDEOFILE`, `#CHARFILE`
+  - `#MIDIFILE`, `#EXWAVzz`, `#PREVIEW`
+  - `#MATERIALSWAV`, `#MATERIALSBMP`, `#PATH_WAV`
+  - `#CDDA`
 - 메타데이터 관련
-    - `#SUBTITLE`, `#SUBARTIST`, `#MAKER`
+  - `#SUBTITLE`, `#SUBARTIST`, `#MAKER`
 
 관련 링크
 
@@ -129,8 +127,8 @@ BGA 대신할 것이 있는 쪽을 지원하는 목적이라 `#BMP`을 뺌.
 
 - `Private Sub OpenBMS(ByVal As String)`
 - `Private Function SaveBMS() As String`
-    - 메타데이터 관련: `#TITLE`, `#ARTIST`, `#SUBTITLE`, `#SUBARTIST`
-    - 파일 정보 관련: `#STAGEFILE`, `#BANNER`, `#BACKBMP`, `#WAV`
+  - 메타데이터 관련: `#TITLE`, `#ARTIST`, `#SUBTITLE`, `#SUBARTIST`
+  - 파일 정보 관련: `#STAGEFILE`, `#BANNER`, `#BACKBMP`, `#WAV`
 
 ##### **μBMSC**
 
@@ -143,15 +141,14 @@ iBMSC와 비슷하게 `#BMP`을 뺌
 `iBMSC/ChartIO.vb`
 
 - `Private Sub OpenBMS(ByVal As String)`
-    - 메타데이터 관련: `#TITLE`, `#ARTIST`, `#SUBTITLE`, `#SUBARTIST`
-    - 파일 정보 관련: `#STAGEFILE`, `#BANNER`, `#BACKBMP`, `#WAV`
+  - 메타데이터 관련: `#TITLE`, `#ARTIST`, `#SUBTITLE`, `#SUBARTIST`
+  - 파일 정보 관련: `#STAGEFILE`, `#BANNER`, `#BACKBMP`, `#WAV`
 
 ##### [Beatoraja]
 
 bms parser: [jbms-parser]
 
 [Beatoraja]: https://github.com/exch-bms2/beatoraja
-
 [jbms-parser]: https://github.com/exch-bms2/jbms-parser
 
 ##### [bemuse]
@@ -159,5 +156,4 @@ bms parser: [jbms-parser]
 bms parser: [bms-js]
 
 [bms-js]: https://github.com/bemusic/bemuse/tree/master/packages/bms
-
 [bemuse]: https://github.com/bemusic/bemuse
