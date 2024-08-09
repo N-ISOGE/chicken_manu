@@ -166,6 +166,13 @@ iBMSC와 비슷하게 `#BMP`을 뺌
   - 메타데이터 관련: `#TITLE`, `#ARTIST`, `#SUBTITLE`, `#SUBARTIST`
   - 파일 정보 관련: `#STAGEFILE`, `#BANNER`, `#BACKBMP`, `#WAV`
 
+##### [Qwilight]
+
+[hitkey BMS command memo]에서 참고한 [Guide to understand BMS format]를 참고해서 파싱
+
+[Qwilight]: https://taehui.ddns.net/ko
+[Guide to understand BMS format]: https://cosmic.mearie.org/2005/03/bmsguide/
+
 ##### [Beatoraja]
 
 bms parser: [jbms-parser]
