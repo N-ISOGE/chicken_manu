@@ -1,0 +1,256 @@
+(* ================================================================== *)
+(* BMS (Be-Music Script) File Format — EBNF Grammar Specification     *)
+(* ================================================================== *)
+(* Notation : W3C XML 1.1 EBNF                                       *)
+(*            https://www.w3.org/TR/2006/REC-xml11-20060816/#sec-notation *)
+(* References:                                                        *)
+(*   - hitkey BMS command memo                                        *)
+(*     https://hitkey.nekokan.dyndns.info/cmds.htm                    *)
+(*   - BM98 Format Specification                                      *)
+(*     https://bm98.yaneu.com/bm98/bmsformat.html                    *)
+(* ================================================================== *)
+
+
+(* ================================================================== *)
+(* 1. 기본 토큰 및 공백                                               *)
+(* ================================================================== *)
+
+DIGIT          ::= [0-9]
+HEX_DIGIT      ::= [0-9A-Fa-f]
+BASE36_DIGIT   ::= [0-9A-Za-z]
+ALPHA          ::= [A-Za-z]
+CHAR           ::= [#x20-#x7E]          (* printable ASCII *)
+NONHASH_CHAR   ::= CHAR - '#'
+WSP            ::= #x20 | #x09          (* space | tab *)
+NL             ::= #x0D? #x0A | #x0D   (* CRLF | LF | CR *)
+EOF            ::= (* end of input *)
+
+
+(* ================================================================== *)
+(* 2. 주석                                                            *)
+(*    세 가지 형식: "//" 행주석, ";" 행주석, "/* */" 블록주석         *)
+(* ================================================================== *)
+
+line_comment   ::= ( '//' | ';' ) ( WSP | CHAR )* NL
+block_comment  ::= '/*' ( CHAR | WSP | NL )* '*/'
+comment        ::= line_comment | block_comment
+
+
+(* ================================================================== *)
+(* 3. 최상위 구조                                                     *)
+(*    bms_file → bms_line*                                            *)
+(* ================================================================== *)
+
+bms_file       ::= ( bms_line | NL )* EOF
+bms_line       ::= WSP* ( control_flow_stmt
+                         | channel_stmt
+                         | header_stmt
+                         | comment
+                         | non_command_line ) NL?
+
+non_command_line ::= NONHASH_CHAR ( CHAR | WSP )*
+                   (* '#'으로 시작하지 않는 행은 주석 또는 무시 대상 *)
+
+
+(* ================================================================== *)
+(* 4. 인덱스 표기                                                     *)
+(*    BM98 원본: hex 두 자리 (00-FF, 256개)                           *)
+(*    현대 확장: base36 두 자리 (00-ZZ, 1296개)                       *)
+(* ================================================================== *)
+
+hex_index      ::= HEX_DIGIT HEX_DIGIT
+base36_index   ::= BASE36_DIGIT BASE36_DIGIT
+index          ::= base36_index          (* 상위 호환; hex_index ⊂ base36_index *)
+
+
+(* ================================================================== *)
+(* 5. 헤더 문장 (#COMMAND [value])                                    *)
+(*    30개 이상 헤더 규칙 개별 정의                                   *)
+(* ================================================================== *)
+
+header_stmt    ::= '#' ( metadata_header
+                       | file_header
+                       | timing_header
+                       | game_header
+                       | gauge_header
+                       | display_header
+                       | misc_header )
+
+(* --- 5-1. 메타데이터 -------------------------------------------- *)
+
+metadata_header
+  ::= 'TITLE'      WSP+ quoted_text
+    | 'SUBTITLE'   WSP+ quoted_text
+    | 'ARTIST'     WSP+ quoted_text
+    | 'SUBARTIST'  WSP+ quoted_text
+    | 'GENRE'      WSP+ quoted_text
+    | 'MAKER'      WSP+ quoted_text
+    | 'COMMENT'    WSP+ quoted_text
+    | 'CHARSET'    WSP+ quoted_text
+
+(* --- 5-2. 파일 참조 --------------------------------------------- *)
+
+file_header
+  ::= 'WAV'        index WSP+ file_path
+    | 'EXWAV'      index WSP+ exwav_params
+    | 'BMP'        index WSP+ file_path
+    | 'EXBMP'      index WSP+ exbmp_params
+    | 'MIDIFILE'   WSP+ file_path
+    | 'VIDEOFILE'  WSP+ file_path
+    | 'MOVIE'      WSP+ file_path
+    | 'PATH_WAV'   WSP+ file_path
+    | 'STAGEFILE'  WSP+ file_path
+    | 'BANNER'     WSP+ file_path
+    | 'BACKBMP'    WSP+ file_path
+    | 'CHARFILE'   WSP+ file_path
+    | 'PREVIEW'    WSP+ file_path
+    | 'CDDA'       WSP+ integer
+    | 'MATERIALSWAV' WSP+ file_path
+    | 'MATERIALSBMP' WSP+ file_path
+
+exwav_params   ::= ( WSP | CHAR )+      (* 구현 의존적 확장 파라미터 *)
+exbmp_params   ::= ( WSP | CHAR )+
+
+(* --- 5-3. 타이밍 ------------------------------------------------ *)
+
+timing_header
+  ::= 'BPM'        ( index WSP+ bpm_value    (* #BPMxx — 확장 BPM 정의 *)
+                    | WSP+ bpm_value )         (* #BPM   — 초기 BPM *)
+    | 'BASEBPM'    WSP+ bpm_value
+    | 'STOP'       index WSP+ stop_value
+    | 'SCROLL'     index WSP+ decimal
+
+(* --- 5-4. 게임플레이 -------------------------------------------- *)
+
+game_header
+  ::= 'PLAYER'     WSP+ [1-4]
+    | 'RANK'       WSP+ [0-4]
+    | 'DEFEXRANK'  WSP+ integer
+    | 'EXRANK'     index WSP+ integer
+    | 'DIFFICULTY' WSP+ [1-5]
+    | 'PLAYLEVEL'  WSP+ integer
+    | 'LNTYPE'     WSP+ [1-2]
+    | 'LNOBJ'      WSP+ index
+    | 'OPTION'     WSP+ quoted_text
+    | 'CHANGEOPTION' index WSP+ quoted_text
+
+(* --- 5-5. 게이지 / 볼륨 ---------------------------------------- *)
+
+gauge_header
+  ::= 'TOTAL'      WSP+ decimal
+    | 'VOLWAV'     WSP+ integer
+
+(* --- 5-6. 표시 / 영상 ------------------------------------------ *)
+
+display_header
+  ::= 'VIDEOf/s'   WSP+ decimal
+    | 'VIDEODLY'   WSP+ integer
+
+(* --- 5-7. 기타 -------------------------------------------------- *)
+
+misc_header
+  ::= '%URL'       WSP+ quoted_text
+    | '%EMAIL'     WSP+ quoted_text
+
+
+(* ================================================================== *)
+(* 6. 제어흐름 블록 — RANDOM / IF / SWITCH / CASE 등                 *)
+(* ================================================================== *)
+
+control_flow_stmt
+  ::= random_block
+    | switch_block
+    | if_block_standalone         (* RANDOM/SWITCH 밖 단독 IF *)
+
+(* --- 6-1. RANDOM 블록 ------------------------------------------- *)
+
+random_block   ::= '#RANDOM'    WSP+ integer NL
+                    random_body
+                    '#ENDRANDOM' NL?
+
+random_body    ::= ( if_block | bms_line | NL )*
+
+(* --- 6-2. IF 블록 (RANDOM 내부) --------------------------------- *)
+
+if_block       ::= '#IF'        WSP+ integer NL
+                    ( bms_line | NL )*
+                    ( '#ELSEIF'  WSP+ integer NL ( bms_line | NL )* )*
+                    ( '#ELSE'    NL ( bms_line | NL )* )?
+                    '#ENDIF'     NL?
+
+if_block_standalone ::= if_block
+
+(* --- 6-3. SWITCH 블록 ------------------------------------------- *)
+
+switch_block   ::= '#SWITCH'    WSP+ integer NL
+                    switch_body
+                    '#ENDSW'     NL?
+
+switch_body    ::= ( case_clause | def_clause | NL )*
+
+case_clause    ::= '#CASE'      WSP+ integer NL
+                    ( bms_line | skip_stmt | NL )*
+
+def_clause     ::= '#DEF'       NL
+                    ( bms_line | NL )*
+
+skip_stmt      ::= '#SKIP' NL
+
+(* --- 6-4. 시드 고정 --------------------------------------------- *)
+
+seed_stmt      ::= '#SETRANDOM'  WSP+ integer NL
+                  | '#SETSWITCH'  WSP+ integer NL
+
+
+(* ================================================================== *)
+(* 7. 채널 문장 — #aaa bb : data                                     *)
+(*    aaa = 마디 번호 (000-999)                                      *)
+(*    bb  = 채널 번호 (base36 두 자리)                                *)
+(*    data = 오브젝트 배열 (인덱스 쌍의 나열)                        *)
+(* ================================================================== *)
+
+channel_stmt   ::= '#' measure_num WSP* channel_id WSP* ':' WSP* channel_data
+
+measure_num    ::= DIGIT DIGIT DIGIT     (* 000 ~ 999 *)
+channel_id     ::= BASE36_DIGIT BASE36_DIGIT
+
+(* --- 7-1. 채널 데이터 형식 -------------------------------------- *)
+
+channel_data   ::= object_array          (* 대부분 채널 *)
+                  | measure_length        (* 채널 02 전용 *)
+
+object_array   ::= ( index )+            (* 인덱스 쌍의 연속; 총 길이 ÷ 2 = 오브젝트 수 *)
+measure_length ::= decimal               (* 채널 02: 마디 길이 배수 *)
+
+(* --- 7-2. 주요 채널 번호 일람 ----------------------------------- *)
+(* 01     BGM (배경음; 다중 선언 가능)                               *)
+(* 02     마디 길이 (소수; 기본값 1.0)                               *)
+(* 03     BPM 변경 (hex 정수, 01-FF)                                 *)
+(* 04     BGA base                                                   *)
+(* 05     Extended object (BM98)                                     *)
+(* 06     BGA poor                                                   *)
+(* 07     BGA layer                                                  *)
+(* 08     확장 BPM (#BPMxx 참조)                                     *)
+(* 09     STOP 시퀀스 (#STOPxx 참조)                                 *)
+(* 0A     BGA layer2                                                 *)
+(*                                                                   *)
+(* 11-19  1P visible (11-15 = key1-5, 16 = SC, 18-19 = key6-7)     *)
+(* 21-29  2P visible                                                 *)
+(* 31-39  1P invisible                                               *)
+(* 41-49  2P invisible                                               *)
+(* 51-59  1P long-note                                               *)
+(* 61-69  2P long-note                                               *)
+(* D1-D9  1P landmine                                                *)
+(* E1-E9  2P landmine                                                *)
+
+
+(* ================================================================== *)
+(* 8. 값 형식 토큰                                                   *)
+(* ================================================================== *)
+
+integer        ::= '-'? DIGIT+
+decimal        ::= '-'? DIGIT+ ( '.' DIGIT+ )?
+bpm_value      ::= decimal               (* 양수; 소수점 허용 *)
+stop_value     ::= integer               (* 1/192 마디 단위 *)
+file_path      ::= ( CHAR - WSP )+       (* 공백 불포함 상대 경로 *)
+quoted_text    ::= ( CHAR | WSP )*       (* 행 끝까지의 자유 텍스트 *)
