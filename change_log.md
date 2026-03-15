@@ -55,26 +55,7 @@
 
 bms 파일 하나와 연관된 파일들을 묶어서 관리함.
 
-```ebnf
-; [ebnf for xml](https://www.w3.org/TR/2006/REC-xml11-20060816/#sec-notation)
-
-single_line_comment ::= ( "//" | ";" ) ( WSP | CHAR )* CRLF
-multi_line_comment ::= "/*" ( WSP | CHAR | CRLF )* "*/"
-c_nl ::= single_line_comment | multi_line_comment | CRLF
-
-block_comment ::= "/*" ( WSP | CHAR )* "*/"
-b_c_wsp ::= block_comment | WSP
-
-bms ::= bms_commend | bms_comment; 명령, 주석? 필수 commend를 안 정했나? 아닌데...
-
-bms_comment ::= CHAR - "#" ( b_c_wsp | CHAR )* c_nl
-bms_commend ::= header ( b_c_wsp | WSP*  parameter )+ c_nl  ; 이거 parameter 개수 맞게 바꿔야 함
-
-header ::= "#" ( "TITLE" | ... )
-
-
-
-```
+EBNF 문법 명세: [`docs/bms.ebnf`](docs/bms.ebnf)
 
 #### 여러 사양들
 
