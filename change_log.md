@@ -101,71 +101,17 @@ Comment 처리?
 
 #### 관련 도구 및 구동기
 
-##### **BMSE**
+파서 구현 상세 및 커맨드 지원 비교: [`docs/bms-parsers.md`](docs/bms-parsers.md)
 
-여기서 대응 안하는 header
-
-- 파일 관련
-  - `#BANNER`, `#BACKBMP`, `#EXBMPzz`, `#VIDEOFILE`, `#CHARFILE`
-  - `#MIDIFILE`, `#EXWAVzz`, `#PREVIEW`
-  - `#MATERIALSWAV`, `#MATERIALSBMP`, `#PATH_WAV`
-  - `#CDDA`
-- 메타데이터 관련
-  - `#SUBTITLE`, `#SUBARTIST`, `#MAKER`
-
-관련 링크
-
-- [site](http://ucn.tokonats.net/software/bmse/)
-- [github](https://github.com/Nekokan/BMSE)
-
-##### **iBMSC**
-
-관련 링크
-
-- [github](https://github.com/aqtq314/iBMSC)
-
-BGA 대신할 것이 있는 쪽을 지원하는 목적이라 `#BMP`을 뺌.
-
-`source/iBMSC/iBMSC/Form1.vb`
-
-- `Private Sub OpenBMS(ByVal As String)`
-- `Private Function SaveBMS() As String`
-  - 메타데이터 관련: `#TITLE`, `#ARTIST`, `#SUBTITLE`, `#SUBARTIST`
-  - 파일 정보 관련: `#STAGEFILE`, `#BANNER`, `#BACKBMP`, `#WAV`
-
-##### **μBMSC**
-
-관련 링크
-
-- [github]([https://github.com/zardoru/iBMSC)
-
-iBMSC와 비슷하게 `#BMP`을 뺌
-
-`iBMSC/ChartIO.vb`
-
-- `Private Sub OpenBMS(ByVal As String)`
-  - 메타데이터 관련: `#TITLE`, `#ARTIST`, `#SUBTITLE`, `#SUBARTIST`
-  - 파일 정보 관련: `#STAGEFILE`, `#BANNER`, `#BACKBMP`, `#WAV`
-
-##### [Qwilight]
-
-[hitkey BMS command memo]에서 참고한 [Guide to understand BMS format]를 참고해서 파싱
-
-[Qwilight]: https://taehui.ddns.net/ko
-[Guide to understand BMS format]: https://cosmic.mearie.org/2005/03/bmsguide/
-
-##### [Beatoraja]
-
-bms parser: [jbms-parser]
-
-[Beatoraja]: https://github.com/exch-bms2/beatoraja
+| 도구 | 종류 | 저장소 |
+|------|------|--------|
+| BMSE | 편집기 | [github](https://github.com/Nekokan/BMSE) / [site](http://ucn.tokonats.net/software/bmse/) |
+| iBMSC | 편집기 | [github](https://github.com/aqtq314/iBMSC) |
+| μBMSC | 편집기 (iBMSC 포크) | [github](https://github.com/zardoru/iBMSC) |
+| Qwilight | 구동기 | [site](https://taehui.ddns.net/ko) |
+| Beatoraja | 구동기 | [github](https://github.com/exch-bms2/beatoraja) — 파서: [jbms-parser] |
+| bemuse | 구동기 | [github](https://github.com/bemusic/bemuse) — 파서: [bms-js] |
 
 [jbms-parser]: https://github.com/exch-bms2/jbms-parser
-
-##### [bemuse]
-
-bms parser: [bms-js]
-
 [bms-js]: https://github.com/bemusic/bemuse/tree/master/packages/bms
-
-[bemuse]: https://github.com/bemusic/bemuse
+[Guide to understand BMS format]: https://cosmic.mearie.org/2005/03/bmsguide/
