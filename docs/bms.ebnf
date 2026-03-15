@@ -258,10 +258,16 @@ file_path        ::= PATH_CHAR+
                      (* 비ASCII 경로(한글·일본어 디렉터리 등) 허용;   *)
                      (* 구현 호환성을 위해 ASCII 경로를 권장한다       *)
 
-integer          ::= '-'? DIGIT+
-decimal          ::= '-'? DIGIT+ ( '.' DIGIT+ )?
-bpm_value        ::= decimal             (* 양수; 소수점 허용          *)
-stop_value       ::= integer             (* 1/192 마디 단위            *)
+unsigned_integer ::= DIGIT+
+                     (* 음수 부호 없는 비음 정수 — BMS 파라미터 대부분이 해당 *)
+unsigned_decimal ::= DIGIT+ ( '.' DIGIT+ )?
+                     (* 음수 부호 없는 비음 소수                       *)
+integer          ::= '-'? unsigned_integer
+                     (* 부호 있는 정수 — 음수를 허용하는 파라미터 전용 *)
+decimal          ::= '-'? unsigned_decimal
+                     (* 부호 있는 소수 — 음수를 허용하는 파라미터 전용 *)
+bpm_value        ::= unsigned_decimal    (* 양수; 소수점 허용; 0 또는 음수 불가 *)
+stop_value       ::= unsigned_integer    (* 1/192 마디 단위; 비음 정수        *)
 
 
 (* ================================================================== *)
@@ -365,7 +371,7 @@ file_header
     | 'BACKBMP'      WSP+ file_path
     | 'CHARFILE'     WSP+ file_path
     | 'PREVIEW'      WSP+ file_path
-    | 'CDDA'         WSP+ integer
+    | 'CDDA'         WSP+ unsigned_integer
     | 'MATERIALSWAV' WSP+ file_path
     | 'MATERIALSBMP' WSP+ file_path
 
@@ -386,7 +392,7 @@ game_header
     | 'DEFEXRANK'    WSP+ integer
     | 'EXRANK'       index WSP+ integer
     | 'DIFFICULTY'   WSP+ ( '1' | '2' | '3' | '4' | '5' )
-    | 'PLAYLEVEL'    WSP+ integer
+    | 'PLAYLEVEL'    WSP+ unsigned_integer
     | 'LNTYPE'       WSP+ ( '1' | '2' )
     | 'LNOBJ'        WSP+ index
     | 'OPTION'       WSP+ quoted_text
@@ -396,14 +402,14 @@ game_header
 (* --- §5-5. 게이지 / 볼륨 ---------------------------------------  *)
 
 gauge_header
-  ::= 'TOTAL'        WSP+ decimal
-    | 'VOLWAV'       WSP+ integer
+  ::= 'TOTAL'        WSP+ unsigned_decimal
+    | 'VOLWAV'       WSP+ unsigned_integer
 
 (* --- §5-6. 표시 / 영상 -----------------------------------------  *)
 
 display_header
-  ::= 'VIDEOf/s'     WSP+ decimal
-    | 'VIDEODLY'     WSP+ integer
+  ::= 'VIDEOf/s'     WSP+ unsigned_decimal
+    | 'VIDEODLY'     WSP+ unsigned_integer
 
 (* --- §5-7. 기타 ------------------------------------------------  *)
 
@@ -423,7 +429,8 @@ control_flow_stmt
 
 (* --- §6-1. RANDOM 블록 -----------------------------------------  *)
 
-random_block     ::= '#RANDOM'    WSP+ integer NL
+random_block     ::= '#RANDOM'    WSP+ unsigned_integer NL
+                     (* 난수 범위: 양의 정수 *)
                       random_body
                       '#ENDRANDOM' NL?
 
@@ -432,9 +439,9 @@ random_body      ::= ( if_block | simple_bms_line | NL )*
 
 (* --- §6-2. IF 블록 ---------------------------------------------  *)
 
-if_block         ::= '#IF'        WSP+ integer NL
+if_block         ::= '#IF'        WSP+ unsigned_integer NL
                       ( bms_line | NL )*
-                      ( '#ELSEIF'  WSP+ integer NL ( bms_line | NL )* )*
+                      ( '#ELSEIF'  WSP+ unsigned_integer NL ( bms_line | NL )* )*
                       ( '#ELSE'    NL ( bms_line | NL )* )?
                       '#ENDIF'     NL?
 
@@ -442,13 +449,14 @@ if_block_standalone ::= if_block
 
 (* --- §6-3. SWITCH 블록 -----------------------------------------  *)
 
-switch_block     ::= '#SWITCH'    WSP+ integer NL
+switch_block     ::= '#SWITCH'    WSP+ unsigned_integer NL
+                     (* 분기 범위: 양의 정수 *)
                       switch_body
                       '#ENDSW'     NL?
 
 switch_body      ::= ( case_clause | def_clause | NL )*
 
-case_clause      ::= '#CASE'      WSP+ integer NL
+case_clause      ::= '#CASE'      WSP+ unsigned_integer NL
                       ( simple_bms_line | skip_stmt | NL )*
                       (* 제어흐름 중첩 방지: simple_bms_line 사용     *)
 
@@ -460,8 +468,9 @@ skip_stmt        ::= '#SKIP' NL
 
 (* --- §6-4. 시드 고정 -------------------------------------------  *)
 
-seed_stmt        ::= '#SETRANDOM'  WSP+ integer NL
-                   | '#SETSWITCH'  WSP+ integer NL
+seed_stmt        ::= '#SETRANDOM'  WSP+ unsigned_integer NL
+                   | '#SETSWITCH'  WSP+ unsigned_integer NL
+                     (* 시드 값: 양의 정수 *)
 
 
 (* ================================================================== *)
@@ -482,7 +491,7 @@ channel_data     ::= object_array        (* 대부분의 채널 *)
                    | measure_length      (* 채널 02 전용  *)
 
 object_array     ::= index+              (* 총 길이 ÷ 2 = 오브젝트 수 *)
-measure_length   ::= decimal             (* 채널 02: 마디 길이 배수    *)
+measure_length   ::= unsigned_decimal    (* 채널 02: 마디 길이 배수; 양수여야 함 *)
 
 (* --- §7-2. 주요 채널 번호 일람 ---------------------------------  *)
 (* 01     BGM (배경음; 다중 선언 가능)                               *)
