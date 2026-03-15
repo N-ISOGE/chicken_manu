@@ -268,6 +268,8 @@ decimal          ::= '-'? unsigned_decimal
                      (* 부호 있는 소수 — 음수를 허용하는 파라미터 전용 *)
 bpm_value        ::= unsigned_decimal    (* 양수; 소수점 허용; 0 또는 음수 불가 *)
 stop_value       ::= unsigned_integer    (* 1/192 마디 단위; 비음 정수        *)
+scroll_value     ::= decimal             (* 스크롤 속도 배율; 음수 = 역방향     *)
+                     (* jbms-parser: double 음수 허용; μBMSC: decimal * 10000 내부 저장 *)
 stp_position     ::= DIGIT DIGIT DIGIT '.' DIGIT DIGIT DIGIT
                      (* #STP의 위치 인수: 마디번호.마디내위치           *)
                      (* 예: 001.500 = 마디 001, 위치 500               *)
@@ -402,6 +404,10 @@ timing_header
     | 'STOP'         index WSP+ stop_value
     | 'STP'          WSP+ stp_position WSP+ unsigned_integer
       (* bemaniaDX 확장: 밀리초 단위 정밀 STOP; 채널과 무관하게 동작  *)
+    | 'SCROLL'       index WSP+ scroll_value
+      (* 구현 사실: hitkey 미수록이나 jbms-parser(beatoraja) · BMSE · μBMSC 에서
+         실제 파싱됨. 채널 SC(μBMSC) 또는 자체 테이블로 관리.              *)
+      (* jbms-parser: 음수 허용(역방향 스크롤); μBMSC: #SCROLL + C36 인덱스 *)
 
 (* --- §5-4. 게임플레이 ------------------------------------------  *)
 
