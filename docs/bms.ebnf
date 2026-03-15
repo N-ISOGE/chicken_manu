@@ -1,29 +1,178 @@
 (* ================================================================== *)
 (* BMS (Be-Music Script) File Format — EBNF Grammar Specification     *)
 (* ================================================================== *)
-(* Notation : W3C XML 1.1 EBNF                                       *)
+(* Notation : W3C XML 1.1 EBNF                                        *)
 (*            https://www.w3.org/TR/2006/REC-xml11-20060816/#sec-notation *)
-(* References:                                                        *)
-(*   - hitkey BMS command memo                                        *)
-(*     https://hitkey.nekokan.dyndns.info/cmds.htm                    *)
-(*   - BM98 Format Specification                                      *)
-(*     https://bm98.yaneu.com/bm98/bmsformat.html                    *)
+(* References:                                                         *)
+(*   - hitkey BMS command memo                                         *)
+(*     https://hitkey.nekokan.dyndns.info/cmds.htm                     *)
+(*   - BM98 Format Specification                                       *)
+(*     https://bm98.yaneu.com/bm98/bmsformat.html                     *)
+(* ================================================================== *)
+(* [문자 인코딩에 대하여]                                             *)
+(*                                                                    *)
+(* 원본 BM98 명세에는 인코딩 규정이 없다. 역사적으로 일본 BMS는      *)
+(* Shift_JIS, 한국 BMS는 EUC-KR 또는 UTF-8로 작성되어 왔다.         *)
+(*                                                                    *)
+(* 이 문법은 인코딩을 추상화하여 "유니코드 코드 포인트" 단위로       *)
+(* 문자를 기술한다. 파서는 실제 바이트 스트림을 읽기 전에            *)
+(* 인코딩을 결정해야 하며, 그 방법은 아래 우선순위를 따른다:         *)
+(*                                                                    *)
+(*   1. #CHARSET 헤더가 있으면 그 값을 인코딩으로 사용               *)
+(*      (예: #CHARSET UTF-8, #CHARSET Shift_JIS)                     *)
+(*   2. BOM(Byte Order Mark)이 있으면 그에 따라 결정                 *)
+(*      UTF-8 BOM: EF BB BF  /  UTF-16 LE BOM: FF FE                *)
+(*   3. 위 단서가 없으면 구현 의존 (사실상 Shift_JIS 또는 UTF-8)    *)
+(*                                                                    *)
+(* 이 문법의 모든 문자 정의는 코드 포인트 범위의 직접 나열로         *)
+(* 표현한다. 상위 집합은 하위 범위 정의들의 합성(|)으로만 표현하며, *)
+(* 집합 뺄셈(-) 연산은 사용하지 않는다.                              *)
 (* ================================================================== *)
 
 
 (* ================================================================== *)
-(* 1. 기본 토큰 및 공백                                               *)
+(* 1. 코드 포인트 정의 계층                                           *)
+(*                                                                    *)
+(* 계층 구조:                                                         *)
+(*                                                                    *)
+(*  [Layer 0] 제어 코드 포인트 (개별 범위로 직접 정의)               *)
+(*      CP_NUL, CP_HT, CP_LF, CP_CR, CP_SP                          *)
+(*      CP_SURROGATE_PAIR (서로게이트 쌍 — 유니코드 스칼라에서 제외) *)
+(*                                                                    *)
+(*  [Layer 1] 인쇄 가능 코드 포인트 범위 (직접 범위 나열)            *)
+(*      CP_ASCII_PRINT   U+0021–U+007E  (ASCII 출력, 공백 제외)      *)
+(*      CP_HIGH_UNICODE  U+0080–U+D7FF  (비ASCII BMP 상단 절반)      *)
+(*                       U+E000–U+FFFD  (PUA 및 BMP 나머지)          *)
+(*                       U+10000–U+10FFFF (보조 평면)                *)
+(*                                                                    *)
+(*  [Layer 2] 문맥별 단말 집합 (Layer 0–1의 합성)                    *)
+(*      ASCII_DIGIT, ASCII_UPPER, ASCII_LOWER                        *)
+(*      PRINTABLE_ASCII  = CP_SP | CP_ASCII_PRINT                    *)
+(*      NONASCII         = CP_HIGH_UNICODE                           *)
+(*      LINE_CHAR        = PRINTABLE_ASCII | NONASCII  (줄바꿈 제외) *)
+(*      PATH_CHAR        = CP_ASCII_PRINT  | NONASCII  (공백·탭 제외)*)
+(*                                                                    *)
+(*  [Layer 3] 어휘 규칙 (Layer 2의 합성)                             *)
+(*      DIGIT, HEX_DIGIT, BASE36_DIGIT, ALPHA                        *)
+(*      WSP, NL                                                       *)
+(*      quoted_text, file_path, ...                                   *)
 (* ================================================================== *)
 
-DIGIT          ::= [0-9]
-HEX_DIGIT      ::= [0-9A-Fa-f]
-BASE36_DIGIT   ::= [0-9A-Za-z]
-ALPHA          ::= [A-Za-z]
-CHAR           ::= [#x20-#x7E]          (* printable ASCII *)
-NONHASH_CHAR   ::= CHAR - '#'
-WSP            ::= #x20 | #x09          (* space | tab *)
-NL             ::= #x0D? #x0A | #x0D   (* CRLF | LF | CR *)
-EOF            ::= (* end of input *)
+
+(* ================================================================== *)
+(* 1-0. Layer 0 : 제어 코드 포인트                                    *)
+(* ================================================================== *)
+
+CP_NUL           ::= #x0000              (* U+0000  NULL — BMS에 허용되지 않음 *)
+CP_HT            ::= #x0009              (* U+0009  HORIZONTAL TAB              *)
+CP_LF            ::= #x000A              (* U+000A  LINE FEED                   *)
+CP_CR            ::= #x000D              (* U+000D  CARRIAGE RETURN             *)
+CP_SP            ::= #x0020              (* U+0020  SPACE                       *)
+
+(* 서로게이트 쌍: UTF-16 내부 표현 전용; 유니코드 스칼라 값이 아님   *)
+(* 이 문법의 어떤 규칙에도 등장하지 않으며, 참조 목적으로만 나열함  *)
+(* CP_SURROGATE   ::= [#xD800-#xDFFF]   ← 사용 금지                 *)
+
+
+(* ================================================================== *)
+(* 1-1. Layer 1 : 인쇄 가능 코드 포인트 범위                          *)
+(* ================================================================== *)
+
+(* ASCII 출력 가능 범위 (공백 U+0020 제외)                           *)
+CP_ASCII_PRINT   ::= [#x0021-#x007E]
+                     (* U+0021 '!' ~ U+007E '~'                       *)
+
+(* 비ASCII 유니코드 범위 — 서로게이트 쌍을 제외한 세 구간            *)
+(* 구간 1: U+0080–U+D7FF  Latin 보충 ~ 한글 자모 끝                  *)
+(* 구간 2: U+E000–U+FFFD  PUA ~ BMP 끝 (U+FFFE·U+FFFF 는 비문자)    *)
+(* 구간 3: U+10000–U+10FFFF  보조 평면 전체                           *)
+CP_HIGH_UNICODE  ::= [#x0080-#xD7FF]
+                   | [#xE000-#xFFFD]
+                   | [#x10000-#x10FFFF]
+
+
+(* ================================================================== *)
+(* 1-2. Layer 2 : 문맥별 단말 집합                                    *)
+(* ================================================================== *)
+
+(* --- ASCII 소범주 (Layer 1의 하위 범위) -------------------------- *)
+
+ASCII_DIGIT      ::= [#x0030-#x0039]     (* '0'–'9' *)
+ASCII_UPPER      ::= [#x0041-#x005A]     (* 'A'–'Z' *)
+ASCII_LOWER      ::= [#x0061-#x007A]     (* 'a'–'z' *)
+ASCII_ALPHA      ::= ASCII_UPPER | ASCII_LOWER
+ASCII_ALNUM      ::= ASCII_DIGIT | ASCII_UPPER | ASCII_LOWER
+
+(* HEX_UPPER: 'A'–'F' — CP_ASCII_PRINT 의 부분 범위                 *)
+ASCII_HEX_UPPER  ::= [#x0041-#x0046]     (* 'A'–'F' *)
+ASCII_HEX_LOWER  ::= [#x0061-#x0066]     (* 'a'–'f' *)
+
+(* --- 인쇄 가능 ASCII (공백 포함) --------------------------------- *)
+(*     = CP_SP | CP_ASCII_PRINT                                       *)
+
+PRINTABLE_ASCII  ::= CP_SP               (* U+0020 *)
+                   | CP_ASCII_PRINT      (* U+0021–U+007E *)
+
+(* --- 비ASCII (보충 평면 포함) ------------------------------------ *)
+(*     = CP_HIGH_UNICODE                                              *)
+
+NONASCII         ::= CP_HIGH_UNICODE     (* U+0080–U+D7FF            *)
+                                         (* U+E000–U+FFFD            *)
+                                         (* U+10000–U+10FFFF         *)
+
+(* --- LINE_CHAR: 한 행 안에서 등장 가능한 모든 문자 --------------- *)
+(*     줄바꿈(CP_LF, CP_CR)과 NUL(CP_NUL)을 제외                    *)
+(*     탭(CP_HT)은 포함 (일부 구현에서 헤더 구분자로 사용)           *)
+(*     = CP_HT | PRINTABLE_ASCII | NONASCII                          *)
+
+LINE_CHAR        ::= CP_HT               (* U+0009 *)
+                   | PRINTABLE_ASCII     (* U+0020–U+007E *)
+                   | NONASCII           (* U+0080– (서로게이트 제외) *)
+
+(* --- PATH_CHAR: 파일 경로를 구성하는 문자 ------------------------ *)
+(*     공백(CP_SP), 탭(CP_HT), 줄바꿈(CP_LF, CP_CR)을 제외          *)
+(*     = CP_ASCII_PRINT | NONASCII                                    *)
+(*     주의: OS/FS 금지 문자(Win32: \ / : * ? " < > |)는             *)
+(*           이 문법 외부에서 별도로 제약한다                         *)
+
+PATH_CHAR        ::= CP_ASCII_PRINT      (* U+0021–U+007E *)
+                   | NONASCII           (* U+0080– (서로게이트 제외) *)
+
+
+(* ================================================================== *)
+(* 1-3. Layer 3 : 어휘 규칙                                           *)
+(* ================================================================== *)
+
+(* --- ASCII 수치·식별자 (커맨드명·인덱스 등 ASCII 고정 문맥) ------ *)
+
+DIGIT            ::= ASCII_DIGIT         (* '0'–'9' *)
+HEX_DIGIT        ::= ASCII_DIGIT | ASCII_HEX_UPPER | ASCII_HEX_LOWER
+BASE36_DIGIT     ::= ASCII_DIGIT | ASCII_UPPER | ASCII_LOWER
+ALPHA            ::= ASCII_ALPHA
+
+(* --- 공백·줄바꿈 ------------------------------------------------- *)
+
+WSP              ::= CP_HT | CP_SP       (* U+0009 tab | U+0020 space *)
+NL               ::= CP_CR? CP_LF        (* CRLF | LF                 *)
+                   | CP_CR               (* CR 단독 (레거시)           *)
+EOF              ::= (* end of input *)
+
+(* --- 값 형식 토큰 ------------------------------------------------ *)
+
+quoted_text      ::= LINE_CHAR*
+                     (* 줄바꿈을 제외한 모든 문자 허용                 *)
+                     (* Shift_JIS·EUC-KR·UTF-8 등 인코딩은            *)
+                     (* #CHARSET 선언 또는 파서의 BOM 검출로 결정한다  *)
+
+file_path        ::= PATH_CHAR+
+                     (* 공백·탭·줄바꿈을 제외한 경로 구성 문자        *)
+                     (* 비ASCII 경로(한글·일본어 디렉터리 등) 허용;   *)
+                     (* 구현 호환성을 위해 ASCII 경로를 권장한다       *)
+
+integer          ::= '-'? DIGIT+
+decimal          ::= '-'? DIGIT+ ( '.' DIGIT+ )?
+bpm_value        ::= decimal             (* 양수; 소수점 허용          *)
+stop_value       ::= integer             (* 1/192 마디 단위            *)
 
 
 (* ================================================================== *)
@@ -31,9 +180,11 @@ EOF            ::= (* end of input *)
 (*    세 가지 형식: "//" 행주석, ";" 행주석, "/* */" 블록주석         *)
 (* ================================================================== *)
 
-line_comment   ::= ( '//' | ';' ) ( WSP | CHAR )* NL
-block_comment  ::= '/*' ( CHAR | WSP | NL )* '*/'
-comment        ::= line_comment | block_comment
+line_comment     ::= ( '//' | ';' ) LINE_CHAR* NL
+                     (* 행 끝까지 임의의 유니코드 텍스트 허용          *)
+block_comment    ::= '/*' ( LINE_CHAR | NL )* '*/'
+                     (* 블록 안에서 줄바꿈과 유니코드 텍스트 모두 허용 *)
+comment          ::= line_comment | block_comment
 
 
 (* ================================================================== *)
@@ -41,15 +192,21 @@ comment        ::= line_comment | block_comment
 (*    bms_file → bms_line*                                            *)
 (* ================================================================== *)
 
-bms_file       ::= ( bms_line | NL )* EOF
-bms_line       ::= WSP* ( control_flow_stmt
-                         | channel_stmt
-                         | header_stmt
-                         | comment
-                         | non_command_line ) NL?
+bms_file         ::= ( bms_line | NL )* EOF
+bms_line         ::= WSP* ( control_flow_stmt
+                           | channel_stmt
+                           | header_stmt
+                           | comment
+                           | non_command_line ) NL?
 
-non_command_line ::= NONHASH_CHAR ( CHAR | WSP )*
-                   (* '#'으로 시작하지 않는 행은 주석 또는 무시 대상 *)
+(* '#'으로 시작하지 않는 행 — 주석 또는 무시 대상; 유니코드 허용     *)
+(* 첫 문자가 '#'이 아닌 LINE_CHAR, 이후는 임의의 LINE_CHAR 연속      *)
+non_command_line ::= ( CP_HT
+                     | CP_SP
+                     | NONASCII
+                     | [#x0021-#x0022]       (* '!' '"' *)
+                     | [#x0024-#x007E]       (* '$'–'~', '#'(#x23) 제외 *)
+                     ) LINE_CHAR*
 
 
 (* ================================================================== *)
@@ -58,169 +215,165 @@ non_command_line ::= NONHASH_CHAR ( CHAR | WSP )*
 (*    현대 확장: base36 두 자리 (00-ZZ, 1296개)                       *)
 (* ================================================================== *)
 
-hex_index      ::= HEX_DIGIT HEX_DIGIT
-base36_index   ::= BASE36_DIGIT BASE36_DIGIT
-index          ::= base36_index          (* 상위 호환; hex_index ⊂ base36_index *)
+hex_index        ::= HEX_DIGIT HEX_DIGIT
+base36_index     ::= BASE36_DIGIT BASE36_DIGIT
+index            ::= base36_index        (* 상위 호환; hex_index ⊂ base36_index *)
 
 
 (* ================================================================== *)
 (* 5. 헤더 문장 (#COMMAND [value])                                    *)
-(*    30개 이상 헤더 규칙 개별 정의                                   *)
 (* ================================================================== *)
 
-header_stmt    ::= '#' ( metadata_header
-                       | file_header
-                       | timing_header
-                       | game_header
-                       | gauge_header
-                       | display_header
-                       | misc_header )
+header_stmt      ::= '#' ( metadata_header
+                         | file_header
+                         | timing_header
+                         | game_header
+                         | gauge_header
+                         | display_header
+                         | misc_header )
 
 (* --- 5-1. 메타데이터 -------------------------------------------- *)
 
 metadata_header
-  ::= 'TITLE'      WSP+ quoted_text
-    | 'SUBTITLE'   WSP+ quoted_text
-    | 'ARTIST'     WSP+ quoted_text
-    | 'SUBARTIST'  WSP+ quoted_text
-    | 'GENRE'      WSP+ quoted_text
-    | 'MAKER'      WSP+ quoted_text
-    | 'COMMENT'    WSP+ quoted_text
-    | 'CHARSET'    WSP+ quoted_text
+  ::= 'TITLE'        WSP+ quoted_text
+    | 'SUBTITLE'     WSP+ quoted_text
+    | 'ARTIST'       WSP+ quoted_text
+    | 'SUBARTIST'    WSP+ quoted_text
+    | 'GENRE'        WSP+ quoted_text
+    | 'MAKER'        WSP+ quoted_text
+    | 'COMMENT'      WSP+ quoted_text
+    | 'CHARSET'      WSP+ quoted_text
 
 (* --- 5-2. 파일 참조 --------------------------------------------- *)
 
 file_header
-  ::= 'WAV'        index WSP+ file_path
-    | 'EXWAV'      index WSP+ exwav_params
-    | 'BMP'        index WSP+ file_path
-    | 'EXBMP'      index WSP+ exbmp_params
-    | 'MIDIFILE'   WSP+ file_path
-    | 'VIDEOFILE'  WSP+ file_path
-    | 'MOVIE'      WSP+ file_path
-    | 'PATH_WAV'   WSP+ file_path
-    | 'STAGEFILE'  WSP+ file_path
-    | 'BANNER'     WSP+ file_path
-    | 'BACKBMP'    WSP+ file_path
-    | 'CHARFILE'   WSP+ file_path
-    | 'PREVIEW'    WSP+ file_path
-    | 'CDDA'       WSP+ integer
+  ::= 'WAV'          index WSP+ file_path
+    | 'EXWAV'        index WSP+ LINE_CHAR+  (* 구현 의존적 확장 파라미터 *)
+    | 'BMP'          index WSP+ file_path
+    | 'EXBMP'        index WSP+ LINE_CHAR+
+    | 'MIDIFILE'     WSP+ file_path
+    | 'VIDEOFILE'    WSP+ file_path
+    | 'MOVIE'        WSP+ file_path
+    | 'PATH_WAV'     WSP+ file_path
+    | 'STAGEFILE'    WSP+ file_path
+    | 'BANNER'       WSP+ file_path
+    | 'BACKBMP'      WSP+ file_path
+    | 'CHARFILE'     WSP+ file_path
+    | 'PREVIEW'      WSP+ file_path
+    | 'CDDA'         WSP+ integer
     | 'MATERIALSWAV' WSP+ file_path
     | 'MATERIALSBMP' WSP+ file_path
-
-exwav_params   ::= ( WSP | CHAR )+      (* 구현 의존적 확장 파라미터 *)
-exbmp_params   ::= ( WSP | CHAR )+
 
 (* --- 5-3. 타이밍 ------------------------------------------------ *)
 
 timing_header
-  ::= 'BPM'        ( index WSP+ bpm_value    (* #BPMxx — 확장 BPM 정의 *)
-                    | WSP+ bpm_value )         (* #BPM   — 초기 BPM *)
-    | 'BASEBPM'    WSP+ bpm_value
-    | 'STOP'       index WSP+ stop_value
-    | 'SCROLL'     index WSP+ decimal
+  ::= 'BPM'          ( index WSP+ bpm_value   (* #BPMxx — 확장 BPM 정의 *)
+                     | WSP+ bpm_value )        (* #BPM   — 초기 BPM      *)
+    | 'BASEBPM'      WSP+ bpm_value
+    | 'STOP'         index WSP+ stop_value
+    | 'SCROLL'       index WSP+ decimal
 
 (* --- 5-4. 게임플레이 -------------------------------------------- *)
 
 game_header
-  ::= 'PLAYER'     WSP+ [1-4]
-    | 'RANK'       WSP+ [0-4]
-    | 'DEFEXRANK'  WSP+ integer
-    | 'EXRANK'     index WSP+ integer
-    | 'DIFFICULTY' WSP+ [1-5]
-    | 'PLAYLEVEL'  WSP+ integer
-    | 'LNTYPE'     WSP+ [1-2]
-    | 'LNOBJ'      WSP+ index
-    | 'OPTION'     WSP+ quoted_text
+  ::= 'PLAYER'       WSP+ [1-4]
+    | 'RANK'         WSP+ [0-4]
+    | 'DEFEXRANK'    WSP+ integer
+    | 'EXRANK'       index WSP+ integer
+    | 'DIFFICULTY'   WSP+ [1-5]
+    | 'PLAYLEVEL'    WSP+ integer
+    | 'LNTYPE'       WSP+ [1-2]
+    | 'LNOBJ'        WSP+ index
+    | 'OPTION'       WSP+ quoted_text
     | 'CHANGEOPTION' index WSP+ quoted_text
 
 (* --- 5-5. 게이지 / 볼륨 ---------------------------------------- *)
 
 gauge_header
-  ::= 'TOTAL'      WSP+ decimal
-    | 'VOLWAV'     WSP+ integer
+  ::= 'TOTAL'        WSP+ decimal
+    | 'VOLWAV'       WSP+ integer
 
 (* --- 5-6. 표시 / 영상 ------------------------------------------ *)
 
 display_header
-  ::= 'VIDEOf/s'   WSP+ decimal
-    | 'VIDEODLY'   WSP+ integer
+  ::= 'VIDEOf/s'     WSP+ decimal
+    | 'VIDEODLY'     WSP+ integer
 
 (* --- 5-7. 기타 -------------------------------------------------- *)
 
 misc_header
-  ::= '%URL'       WSP+ quoted_text
-    | '%EMAIL'     WSP+ quoted_text
+  ::= '%URL'         WSP+ quoted_text
+    | '%EMAIL'       WSP+ quoted_text
 
 
 (* ================================================================== *)
-(* 6. 제어흐름 블록 — RANDOM / IF / SWITCH / CASE 등                 *)
+(* 6. 제어흐름 블록 — RANDOM / IF / SWITCH / CASE 등                  *)
 (* ================================================================== *)
 
 control_flow_stmt
   ::= random_block
     | switch_block
-    | if_block_standalone         (* RANDOM/SWITCH 밖 단독 IF *)
+    | if_block_standalone        (* RANDOM/SWITCH 밖 단독 IF *)
 
 (* --- 6-1. RANDOM 블록 ------------------------------------------- *)
 
-random_block   ::= '#RANDOM'    WSP+ integer NL
-                    random_body
-                    '#ENDRANDOM' NL?
+random_block     ::= '#RANDOM'    WSP+ integer NL
+                      random_body
+                      '#ENDRANDOM' NL?
 
-random_body    ::= ( if_block | bms_line | NL )*
+random_body      ::= ( if_block | bms_line | NL )*
 
-(* --- 6-2. IF 블록 (RANDOM 내부) --------------------------------- *)
+(* --- 6-2. IF 블록 ----------------------------------------------- *)
 
-if_block       ::= '#IF'        WSP+ integer NL
-                    ( bms_line | NL )*
-                    ( '#ELSEIF'  WSP+ integer NL ( bms_line | NL )* )*
-                    ( '#ELSE'    NL ( bms_line | NL )* )?
-                    '#ENDIF'     NL?
+if_block         ::= '#IF'        WSP+ integer NL
+                      ( bms_line | NL )*
+                      ( '#ELSEIF'  WSP+ integer NL ( bms_line | NL )* )*
+                      ( '#ELSE'    NL ( bms_line | NL )* )?
+                      '#ENDIF'     NL?
 
 if_block_standalone ::= if_block
 
 (* --- 6-3. SWITCH 블록 ------------------------------------------- *)
 
-switch_block   ::= '#SWITCH'    WSP+ integer NL
-                    switch_body
-                    '#ENDSW'     NL?
+switch_block     ::= '#SWITCH'    WSP+ integer NL
+                      switch_body
+                      '#ENDSW'     NL?
 
-switch_body    ::= ( case_clause | def_clause | NL )*
+switch_body      ::= ( case_clause | def_clause | NL )*
 
-case_clause    ::= '#CASE'      WSP+ integer NL
-                    ( bms_line | skip_stmt | NL )*
+case_clause      ::= '#CASE'      WSP+ integer NL
+                      ( bms_line | skip_stmt | NL )*
 
-def_clause     ::= '#DEF'       NL
-                    ( bms_line | NL )*
+def_clause       ::= '#DEF'       NL
+                      ( bms_line | NL )*
 
-skip_stmt      ::= '#SKIP' NL
+skip_stmt        ::= '#SKIP' NL
 
 (* --- 6-4. 시드 고정 --------------------------------------------- *)
 
-seed_stmt      ::= '#SETRANDOM'  WSP+ integer NL
-                  | '#SETSWITCH'  WSP+ integer NL
+seed_stmt        ::= '#SETRANDOM'  WSP+ integer NL
+                   | '#SETSWITCH'  WSP+ integer NL
 
 
 (* ================================================================== *)
-(* 7. 채널 문장 — #aaa bb : data                                     *)
-(*    aaa = 마디 번호 (000-999)                                      *)
+(* 7. 채널 문장 — #aaa bb : data                                      *)
+(*    aaa = 마디 번호 (000-999, 10진수)                               *)
 (*    bb  = 채널 번호 (base36 두 자리)                                *)
-(*    data = 오브젝트 배열 (인덱스 쌍의 나열)                        *)
+(*    data = 오브젝트 배열 (인덱스 쌍의 나열)                         *)
 (* ================================================================== *)
 
-channel_stmt   ::= '#' measure_num WSP* channel_id WSP* ':' WSP* channel_data
+channel_stmt     ::= '#' measure_num WSP* channel_id WSP* ':' WSP* channel_data
 
-measure_num    ::= DIGIT DIGIT DIGIT     (* 000 ~ 999 *)
-channel_id     ::= BASE36_DIGIT BASE36_DIGIT
+measure_num      ::= DIGIT DIGIT DIGIT   (* 000 ~ 999 *)
+channel_id       ::= BASE36_DIGIT BASE36_DIGIT
 
 (* --- 7-1. 채널 데이터 형식 -------------------------------------- *)
 
-channel_data   ::= object_array          (* 대부분 채널 *)
-                  | measure_length        (* 채널 02 전용 *)
+channel_data     ::= object_array        (* 대부분의 채널 *)
+                   | measure_length      (* 채널 02 전용  *)
 
-object_array   ::= ( index )+            (* 인덱스 쌍의 연속; 총 길이 ÷ 2 = 오브젝트 수 *)
-measure_length ::= decimal               (* 채널 02: 마디 길이 배수 *)
+object_array     ::= index+              (* 총 길이 ÷ 2 = 오브젝트 수 *)
+measure_length   ::= decimal             (* 채널 02: 마디 길이 배수    *)
 
 (* --- 7-2. 주요 채널 번호 일람 ----------------------------------- *)
 (* 01     BGM (배경음; 다중 선언 가능)                               *)
@@ -233,8 +386,8 @@ measure_length ::= decimal               (* 채널 02: 마디 길이 배수 *)
 (* 08     확장 BPM (#BPMxx 참조)                                     *)
 (* 09     STOP 시퀀스 (#STOPxx 참조)                                 *)
 (* 0A     BGA layer2                                                 *)
-(*                                                                   *)
-(* 11-19  1P visible (11-15 = key1-5, 16 = SC, 18-19 = key6-7)     *)
+(*                                                                    *)
+(* 11-19  1P visible (11-15=key1-5, 16=SC, 17=FREE, 18-19=key6-7)  *)
 (* 21-29  2P visible                                                 *)
 (* 31-39  1P invisible                                               *)
 (* 41-49  2P invisible                                               *)
@@ -242,15 +395,3 @@ measure_length ::= decimal               (* 채널 02: 마디 길이 배수 *)
 (* 61-69  2P long-note                                               *)
 (* D1-D9  1P landmine                                                *)
 (* E1-E9  2P landmine                                                *)
-
-
-(* ================================================================== *)
-(* 8. 값 형식 토큰                                                   *)
-(* ================================================================== *)
-
-integer        ::= '-'? DIGIT+
-decimal        ::= '-'? DIGIT+ ( '.' DIGIT+ )?
-bpm_value      ::= decimal               (* 양수; 소수점 허용 *)
-stop_value     ::= integer               (* 1/192 마디 단위 *)
-file_path      ::= ( CHAR - WSP )+       (* 공백 불포함 상대 경로 *)
-quoted_text    ::= ( CHAR | WSP )*       (* 행 끝까지의 자유 텍스트 *)
