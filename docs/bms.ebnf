@@ -266,7 +266,7 @@ integer          ::= '-'? unsigned_integer
                      (* 부호 있는 정수 — 음수를 허용하는 파라미터 전용 *)
 decimal          ::= '-'? unsigned_decimal
                      (* 부호 있는 소수 — 음수를 허용하는 파라미터 전용 *)
-bpm_value        ::= unsigned_decimal    (* 양수; 소수점 허용; 0 또는 음수 불가 *)
+bpm_value        ::= unsigned_decimal    (* 구문상 비음 소수; 의미상 0보다 커야 함 *)
 stop_value       ::= unsigned_integer    (* 1/192 마디 단위; 비음 정수        *)
 scroll_value     ::= decimal             (* 스크롤 속도 배율; 음수 = 역방향     *)
                      (* jbms-parser: double 음수 허용; μBMSC: decimal * 10000 내부 저장 *)
@@ -521,7 +521,7 @@ channel_data     ::= object_array        (* 대부분의 채널 *)
                    | measure_length      (* 채널 02 전용  *)
 
 object_array     ::= index+              (* 총 길이 ÷ 2 = 오브젝트 수 *)
-measure_length   ::= unsigned_decimal    (* 채널 02: 마디 길이 배수; 양수여야 함 *)
+measure_length   ::= unsigned_decimal    (* 채널 02: 마디 길이 배수; 의미상 0보다 커야 함 *)
 
 (* --- §7-2. 주요 채널 번호 일람 ---------------------------------  *)
 (* 01     BGM (배경음; 다중 선언 가능)                               *)
