@@ -285,6 +285,17 @@ bms_file         ::= ( bms_line | NL )* EOF
 bms_line         ::= WSP* ( control_flow_stmt
                            | channel_stmt
                            | header_stmt
+                           | seed_stmt
+                           | comment
+                           | non_command_line ) NL?
+
+(* 제어흐름 구문을 포함하지 않는 단순 행 —                           *)
+(* #RANDOM / #SWITCH 블록 내부에서 사용하여 중첩을 방지한다.         *)
+(* control_flow_stmt(= random_block | switch_block | if_block)는     *)
+(* random_body / case_clause / def_clause 에서 허용하지 않는다.      *)
+simple_bms_line  ::= WSP* ( channel_stmt
+                           | header_stmt
+                           | seed_stmt
                            | comment
                            | non_command_line ) NL?
 
@@ -370,16 +381,17 @@ timing_header
 (* --- §5-4. 게임플레이 ------------------------------------------  *)
 
 game_header
-  ::= 'PLAYER'       WSP+ [1-4]
-    | 'RANK'         WSP+ [0-4]
+  ::= 'PLAYER'       WSP+ ( '1' | '2' | '3' | '4' )
+    | 'RANK'         WSP+ ( '0' | '1' | '2' | '3' | '4' )
     | 'DEFEXRANK'    WSP+ integer
     | 'EXRANK'       index WSP+ integer
-    | 'DIFFICULTY'   WSP+ [1-5]
+    | 'DIFFICULTY'   WSP+ ( '1' | '2' | '3' | '4' | '5' )
     | 'PLAYLEVEL'    WSP+ integer
-    | 'LNTYPE'       WSP+ [1-2]
+    | 'LNTYPE'       WSP+ ( '1' | '2' )
     | 'LNOBJ'        WSP+ index
     | 'OPTION'       WSP+ quoted_text
     | 'CHANGEOPTION' index WSP+ quoted_text
+    (* [1-4] 등의 범위 표기는 W3C XML 1.1 EBNF 비표준 — 명시적 열거로 대체 *)
 
 (* --- §5-5. 게이지 / 볼륨 ---------------------------------------  *)
 
@@ -415,7 +427,8 @@ random_block     ::= '#RANDOM'    WSP+ integer NL
                       random_body
                       '#ENDRANDOM' NL?
 
-random_body      ::= ( if_block | bms_line | NL )*
+random_body      ::= ( if_block | simple_bms_line | NL )*
+                     (* if_block 만 허용; random_block / switch_block 중첩 불가 *)
 
 (* --- §6-2. IF 블록 ---------------------------------------------  *)
 
@@ -436,10 +449,12 @@ switch_block     ::= '#SWITCH'    WSP+ integer NL
 switch_body      ::= ( case_clause | def_clause | NL )*
 
 case_clause      ::= '#CASE'      WSP+ integer NL
-                      ( bms_line | skip_stmt | NL )*
+                      ( simple_bms_line | skip_stmt | NL )*
+                      (* 제어흐름 중첩 방지: simple_bms_line 사용     *)
 
 def_clause       ::= '#DEF'       NL
-                      ( bms_line | NL )*
+                      ( simple_bms_line | NL )*
+                      (* 제어흐름 중첩 방지: simple_bms_line 사용     *)
 
 skip_stmt        ::= '#SKIP' NL
 
