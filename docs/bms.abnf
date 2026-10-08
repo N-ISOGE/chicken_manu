@@ -67,7 +67,8 @@ header-value    = *non-eol                     ; verbatim; trim at use
 
 ; unknown or extension header: kept as name + raw value
 generic-command = header-name [ header-sep header-value ]
-header-name     = ( ALPHA / "@" ) *( ALPHA / DIGIT / "_" )
+header-name     = ( ALPHA / "@" ) *( ALPHA / DIGIT / "_" / "/" )
+                                               ; "/" : #VIDEOf/s, #OCT/FP (hitkey)
 
 ; ---- control flow (value is an integer) ------------------------------
 control-command = ( ( "RANDOM" / "SETRANDOM" / "IF" / "ELSEIF"

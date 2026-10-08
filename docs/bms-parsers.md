@@ -60,8 +60,11 @@
 
 #### 인코딩
 
-- `new InputStreamReader(stream, "MS932")` — **Shift_JIS (MS932) 하드코딩**.
-- UTF-8이나 다른 인코딩은 자동 감지하지 않음.
+- 기본값은 `"MS932"`(Shift_JIS)이고, 파일의 앞 64KB로 `detectEncoding`을 호출해 인코딩을 고른다
+  (`BMSDecoder.java`, master 브랜치, 2026-10-08 원문 확인).
+- 순서: BOM(UTF-32BE, UTF-32LE, UTF-8, UTF-16BE, UTF-16LE)을 먼저 보고, BOM이 없으면
+  EUC-KR → MS932 → UTF-8 → UTF-16/32 순으로 시험한다. 모두 맞지 않으면 MS932다.
+- 읽기는 `new InputStreamReader(new ByteArrayInputStream(data), encoding)`. BOM을 제거하는 코드는 찾지 못했다(코드를 읽고 한 추정, 실행 검증 없음).
 - 파일 해시: MD5 + SHA-256 모두 계산.
 
 #### 지원 커맨드 (CommandWord enum)
@@ -134,12 +137,18 @@
 #### 인코딩
 
 - VB.NET 기본 코드페이지 (Windows 시스템 설정에 따름).
+- **주의**: 이 절은 조사한 소스 리비전을 기록하지 않았다. 이후 검토에서 `modInput.vb`가 수동 지정과
+  `DetectEncoding` 자동 감지도 지원한다는 지적이 있었으나, 원문을 찾지 못해 확인하지 못했다(`미확인`).
 
 #### 채널 정의 (OBJ_CH enum 일부)
 
 `CH_SCROLL(1020)`, `CH_SPEED(1033)` 포함 — **`#SCROLLxx` 지원**.
 
 #### 파싱하지 않는 헤더
+
+> **주의**: 아래 목록도 조사한 리비전을 기록하지 않았다. 이후 검토에서 `#BMP`, `#STAGEFILE`, `#SUBTITLE`, `#SUBARTIST`,
+> `#PREVIEW`, `#BANNER`, `#BACKBMP`, `#DEFEXRANK`, `#DIFFICULTY`, `#LNOBJ`, `#TOTAL`, `#VOLWAV`를 처리한다는 지적이 있었으나
+> 원문을 찾지 못해 확인하지 못했다(`미확인`). 이 목록과 비교표의 BMSE 열은 **과거 관찰로만** 읽을 것.
 
 - 파일 관련: `#BANNER`, `#BACKBMP`, `#EXBMPzz`, `#VIDEOFILE`, `#CHARFILE`,
   `#MIDIFILE`, `#EXWAVzz`, `#PREVIEW`, `#MATERIALSWAV`, `#MATERIALSBMP`,
@@ -317,7 +326,7 @@ If Channel = "SC" Then .Value = hSCROLL(C36to10(Mid(sLineTrim, xI1, 2)))
 
 | 구현 | 인코딩 처리 방식 |
 |------|----------------|
-| jbms-parser | `MS932` (Shift_JIS) 하드코딩 |
+| jbms-parser | 기본값 `MS932`. BOM → EUC-KR → MS932 → UTF-8 → UTF-16/32 순으로 64KB 표본을 시험하고 모두 실패하면 MS932 |
 | bms-js | `bemuse-chardet` 자동 감지 + `iconv-lite` 디코딩; hitkey `#CHARSET` 알고리즘 준거; BOM 제거; `forceEncoding` 옵션 |
 | BMSE | Windows 기본 코드페이지 |
 | iBMSC | `System.Text.Encoding.Default` (기본값); 설정 UI에서 변경 가능 |
