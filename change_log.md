@@ -43,6 +43,7 @@
   - CSV의 파일명 필드를 인용한다.
   - 테스트가 임시 폴더에서 입력 파일을 직접 만들어 쓰고(ASCII, Shift-JIS, 잘못된 인코딩, 없는 파일, 디렉터리, CSV 인용), `rustfmt`와 clippy 경고를 정리했다.
 - JSCPD(중복 코드 검사)가 prettier로 정렬한 마크다운 표 두 개를 복제로 잘못 잡아서, 마크다운을 검사 대상에서 뺐다(`.github/linters/.jscpd.json`). 코드(Rust 등)는 계속 검사한다.
+- 의뢰서 B-05(`preservation-metadata`)를 추가했다. 보존에 필요한 메타데이터를 METS, PREMIS 등 표준에서 도출하도록 다른 AI에게 맡기는 지침이다. "형식을 직접 만들지 않고 표준을 따른다"는 방침을 `docs/notes.md`와 `docs/index.md`에 되살렸다.
 - 마크다운 서식(prettier) 검사를 끄고(`VALIDATE_MARKDOWN_PRETTIER: false`) 고치는 파일부터 점진적으로 맞추기로 했다. `docs/bms-parsers.md`를 맞춰 표 스타일(MD060) 지적을 없앴다. 작업 방식(브랜치, 서식)을 `docs/notes.md`에 적었다.
 - 린트가 지적한 문서의 용어 표기, 맨몸 URL을 고쳤다. 제목이 반복되는 `change_log.md`와 `docs/bms-parsers.md`는 파일 안에서만 MD024를 껐다.
 - `Cargo.toml`: Cargo가 무시하던 `[env]` 항목을 지웠다.

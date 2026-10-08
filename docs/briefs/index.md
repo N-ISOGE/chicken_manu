@@ -11,6 +11,7 @@
 | B-02 | [매체의 정의](crate::docs::briefs::medium_definition) | 매체의 구성과 형식을 이론에 기대어 정의 | 아니오(제안 허용) | 작성됨, 아직 넘기지 않음 |
 | B-03 | [저작권과 재배포](crate::docs::briefs::copyright) | 도구가 하는 일의 법적 쟁점 조사 | 예 | 작성됨, 아직 넘기지 않음 |
 | B-04 | [보존 수준과 p2p 열람](crate::docs::briefs::preservation_p2p) | p2p망에서 "열람만"이 가능한지, 보존 수준의 기준 | 아니오(제안 허용) | 작성됨, 아직 넘기지 않음 |
+| B-05 | [보존 메타데이터 표준 조사](crate::docs::briefs::preservation_metadata) | 보존에 필요한 메타데이터를 표준(METS, PREMIS 등)에서 도출 | 아니오(제안 허용) | 작성됨, 아직 넘기지 않음 |
 
 상태와 "넘김" 여부는 사용자가 직접 갱신한다. 결과를 받으면 어디에 두었는지도 이 표에 적는다.
 

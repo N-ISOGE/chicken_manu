@@ -26,6 +26,9 @@ pub mod briefs {
 
     #[doc = include_str!("../docs/briefs/preservation-p2p.md")]
     pub mod preservation_p2p {}
+
+    #[doc = include_str!("../docs/briefs/preservation-metadata.md")]
+    pub mod preservation_metadata {}
 }
 
 #[doc = include_str!("../docs/references.md")]
