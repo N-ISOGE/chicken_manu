@@ -50,8 +50,6 @@ Chicken Menu, 치킨메뉴, ... : 리듬게임·음악게임의 매체를 조사
 | 2. 도구의 명세와 구현 | [`schema.md`](docs/schema.md), [`bms-grammar.md`](docs/bms-grammar.md), [`adoption.md`](docs/adoption.md) |
 | 공통 | [`notes.md`](docs/notes.md)(로드맵), [`change_log.md`](change_log.md) |
 
-다른 AI에게 맡기는 조사 의뢰서는 저장소가 아니라 Google Drive의 "2026년도 / 메세지 큐"에서 관리한다.
-
 ## 기타 사항
 
 - 작성물의 원문을 기준으로 반영함
