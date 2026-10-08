@@ -33,7 +33,10 @@ impl fmt::Display for BMSReadError {
                 write!(f, "WARNING - File can not be read: {}", path)
             }
             BMSReadError::IncorrectEncoding(path, encoding, using_encoding) => {
-                write!(f, "WARNING - incorrect encoding: \n\t file {path},\n\t expect {encoding}, \n\t encoding used {using_encoding}")
+                write!(
+                    f,
+                    "WARNING - incorrect encoding: \n\t file {path},\n\t expect {encoding}, \n\t encoding used {using_encoding}"
+                )
             }
             BMSReadError::ToolFailure(path, reason) => {
                 write!(
