@@ -1,0 +1,63 @@
+# 지원 대상과 명세의 형식화
+
+## 1. 최소 지원 대상 후보
+
+근거는 세 가지다.
+
+1. `pattern.category`는 "기존에 알려진 패턴 형식들의 식별자"를 쓰도록 설계됐다. 채보 포맷·명세 원장(Google Drive 시트, 119행 × 22열)의 ID 규칙 `FMT-<분류>-<번호>`(예: `FMT-KEY-02`)가 이 값으로 들어갈 수 있다.
+2. 원장의 공식성, 신빙성(A/B/C/X), 등록 상태.
+3. 저장소의 로컬 샘플이 BMS 계열뿐이다(.bms 71, .bme 96, .bml 15, .pms 11, 합계 193개). `test_resource/`는 `.gitignore` 대상이라 저장소에는 없다. 다른 계열은 검증용 샘플을 아직 확보하지 못했다.
+
+**범위는 BMS에 한정되지 않는다.** 문서와 코드에서 "BMS, ..."라고 쓴 것은 기타 히어로 계열의 chart, osu!, StepMania(sm, ssc) 등을 포함한 리듬게임 채보 전반을 뜻한다.
+BMS 계열이 가장 먼저 깊이 조사됐을 뿐이다. 다른 계열은 원장에 주소와 평가만 있고 이 프로젝트가 직접 확인한 것은 아직 없다.
+세부 조사는 [기초 조사 지침](crate::docs::research_brief)에 따라 진행한다.
+
+| 단계 | 대상 | 원장 ID | 원장 평가(신빙성·상태) | 비고 |
+| --- | --- | --- | --- | --- |
+| 0 | BMS 계열 `.bms .bme .bml .pms` | KEY-01, 02, 06, 07 | A·검증 / B·추출 / B·식별 / B·식별 | 한 문법으로 처리한다([BMS 문법](crate::docs::bms_grammar)). 확장자는 관행이다. 로컬 샘플이 있어 검증을 마쳤다 |
+| 1 | StepMania `.sm`, `.ssc` | PNL-01, 02 | A·추출 | 공식 위키 문서가 있다 |
+| 1 | osu! `.osu` | VSR-01 | A·추출 | 공식 위키 문서가 있다. `.osz` 묶음, `[Events]`의 배경·영상 참조 |
+| 1 | 기타 히어로 계열 `.chart`, `.mid`, `song.ini`, `.sng` | GTR-01, 02, 04, 05 | B·추출 / A·식별 / B·식별 / B·추출 | 곡 정보가 채보 파일이 아니라 `song.ini`에 있어 "패턴과 관련 파일" 모델을 시험하기 좋다 |
+| 1 | bmson | KEY-04 | A·추출 | JSON. 명세는 Web IDL로 기술(1.0.0-beta, 2015-12-26 이후 정체) |
+| 2 | DTX | KEY-08 | A·추출 | 공식 명세가 공개돼 있고 `.bms/.bme`도 읽는 포맷 |
+| 2 | Quaver `.qua`, KSH/KSON, UltraStar `.txt`, DWI, KSF | VSR-07, ANA-01·02, VOC-01, PNL-04·05 | A·추출 / B·추출 | 텍스트이고 명세가 공개돼 있다 |
+| 3 | 아케이드, 모바일, VR, 특수규칙·레벨형, 외부 표준 | ARC, MOB, VRM, LVL, EXT | 다양 | 이후 단계 |
+| 제외 | 바이너리·비공개·미발견 포맷 | KEY-10~15, 미발견 목록 등 | 발견·식별 | 명세가 없어 파일 참조를 뽑을 수 없다 |
+
+판단 기준(제안): 공개 명세가 있고, 채보에서 딸린 파일로의 참조를 텍스트로 뽑을 수 있는 포맷부터 한다.
+이 단계 구분도 제안이며, 다른 계열을 조사한 뒤에 다시 정해야 한다. 같은 스키마(`pattern`, `file`, `binder`)에 들어가는지는 포맷마다 "채보 단위"(파일 하나에 채보가 몇 개인가)와 "묶음 단위"(폴더, 압축 파일)가 달라 확인이 필요하다.
+
+## 2. 원장 현황
+
+| 상위분류 | 행 수 |
+| --- | --- |
+| 아케이드 계열 | 16 |
+| 건반·키음형(BMS 계열) | 15 |
+| 외부 표준·범용 후보 | 14 |
+| 패널·스텝형 | 11 |
+| VSRG·osu! 계열 | 11 |
+| 기타·밴드형 / 특수규칙·레벨형 | 각 10 |
+| 모바일 터치·판정선형 / 색인·메타 자료 | 각 9 |
+| 폐기·보류(출처 원칙) / VR·모션형 | 각 5 |
+| SDVX·아날로그형 | 3 |
+| 노래·발성형 | 1 |
+
+등록 상태는 발견 24, 식별 34, 검증 13, 추출 43, 폐기 5이고, 신빙성은 A 40, B 42, C 32, X 5다(원장 안내 기준, 2026-09-23).
+원장의 수집 원칙은 "평가·통합 이전에 무엇이 존재하는지 목록화"하는 것이며, AI 자동 생성이 의심되는 사이트(deepwiki, mintlify 자동 문서, grokipedia 등)는 X 등급으로 제외한다.
+
+## 3. 명세를 명세하는 것(형식화된 자료)
+
+**BMS 계열에는 공식 형식 문법이 없다.** hitkey 메모는 세부가 구현 의존이라고 적었고, 웹 검색으로도 BMS의 PEG·ANTLR·EBNF·ABNF·tree-sitter 정의를 찾지 못했다. 파서는 모두 손으로 쓴 코드다(bms-rs는 lexer와 토큰 처리, bemuse bms-js는 reader·compiler·추출의 3단계). 저장소의 `change_log.md`에 있던 EBNF 초안이 형식 문법을 쓰려는 시도다([BMS 문법](crate::docs::bms_grammar)).
+
+| 자료 | 형식화 방식 | 확인 |
+| --- | --- | --- |
+| [bmspec](https://github.com/bemusic/bmspec) (KEY-03) | Gherkin 실행 명세. "공식 명세가 아니다"라고 명시. Unlicense | 부분: README만. `#RANDOM`은 설명에 없음 |
+| [bmson 명세](https://bmson-spec.readthedocs.io/en/master/doc/index.html) (KEY-04) | Web IDL | 확인. JSON Schema 파일은 찾지 못함 |
+| [memon](https://github.com/Stepland/memon) (ARC-10) | JSON Schema | 미확인(원장 기재) |
+| [rd-schema](https://github.com/0f-0b/rd-schema) (LVL-03, Rhythm Doctor) | JSON Schema | 미확인(원장 기재) |
+| SUS v2.7 (ARC-02), simai (ARC-05), Arcaea `.aff` (MOB-01) | 문법 설명 문서, ANTLR 언급 | 미확인(원장 기재) |
+| [RFC 5234 (ABNF)](https://www.rfc-editor.org/rfc/rfc5234) | 표기법 표준 | 확인 |
+
+문법 표기법으로 ABNF를 고른 이유: 줄 단위 텍스트 포맷에 맞고, 따옴표 문자열이 기본적으로 대소문자를 구분하지 않아 "명령은 대소문자 무시"와 맞으며, 문법 파일을 검증할 도구(Python `abnf`)가 있었다.
+저장소의 초안은 W3C XML 표기의 EBNF를 썼다. 두 표기 사이의 변환은 기계적이다.
+Rust 구현에서 pest, nom, winnow 등으로 옮기는 선택은 아직 비교하지 않았다.
