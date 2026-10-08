@@ -247,6 +247,8 @@ fn main() {
             }
         };
 
-        out_put.write(format!("{}\n", file_row).as_bytes()).unwrap();
+        out_put
+            .write_all(format!("{}\n", file_row).as_bytes())
+            .unwrap();
     }
 }

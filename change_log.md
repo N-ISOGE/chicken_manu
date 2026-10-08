@@ -34,6 +34,8 @@
 
 - 린트 워크플로 폴더 이름의 오타를 고쳤다(`.github/workflow` → `.github/workflows`). GitHub Actions는 `workflows`만 읽는다.
 - 린트 워크플로를 갱신했다. `actions/checkout` v4→v6(Node 20 지원 중단 경고), super-linter v6.8.0→v8.7.0, `ubuntu-latest`→`ubuntu-24.04`(2026-10-19부터 `ubuntu-latest`가 Ubuntu 26으로 바뀐다).
+- 워크플로의 액션을 커밋 SHA로 고정하고 `persist-credentials: false`를 설정했다(zizmor 지적). codespell 설정(`.github/linters/.codespellrc`)을 추가했다.
+- `src/main.rs`: `write`를 `write_all`로 바꿨다(clippy `unused_io_amount`).
 - 린트가 지적한 문서의 용어 표기, 맨몸 URL을 고쳤다. 제목이 반복되는 `change_log.md`와 `docs/bms-parsers.md`는 파일 안에서만 MD024를 껐다.
 - `Cargo.toml`: Cargo가 무시하던 `[env]` 항목을 지웠다.
 - `README.md`를 정리했다. "매체"와 "에셋"을 정의하고(에셋은 매체가 참조하는 파일로 매체 바깥), 목적을 두 방향(매체의 형식 조사, 공유·보존 도구의 명세와 구현)으로 나눴다.

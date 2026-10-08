@@ -1,0 +1,5 @@
+[codespell]
+# lazer: osu!lazer(고유명사). readed: 테스트 결과 파일의 확장자(".readed").
+ignore-words-list = lazer,readed
+# 외부 템플릿에서 가져온 파일
+skip = .gitignore
