@@ -5,7 +5,7 @@
 조사 중 정정된 사실은 [기술 채택 판단](crate::docs::adoption)에 있다.
 
 이 문서는 링크를 모은 **개요**다. 구동기·파서·규격을 하나씩 세부 문서로 조사하는 방법과 대상 목록은
-[기초 조사 지침](crate::docs::research_brief)에 있다.
+[기초 조사 지침](crate::docs::briefs::format_survey)에 있다.
 
 ## 1. BMS 명세
 

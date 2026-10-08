@@ -13,8 +13,20 @@ pub mod changelog {}
 #[doc = include_str!("../docs/notes.md")]
 pub mod notes {}
 
-#[doc = include_str!("../docs/research-brief.md")]
-pub mod research_brief {}
+#[doc = include_str!("../docs/briefs/index.md")]
+pub mod briefs {
+    #[doc = include_str!("../docs/briefs/format-survey.md")]
+    pub mod format_survey {}
+
+    #[doc = include_str!("../docs/briefs/medium-definition.md")]
+    pub mod medium_definition {}
+
+    #[doc = include_str!("../docs/briefs/copyright.md")]
+    pub mod copyright {}
+
+    #[doc = include_str!("../docs/briefs/preservation-p2p.md")]
+    pub mod preservation_p2p {}
+}
 
 #[doc = include_str!("../docs/references.md")]
 pub mod references {}

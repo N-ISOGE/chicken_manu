@@ -23,8 +23,11 @@
 - `docs/`에 조사 문서를 추가하고 `cargo doc`으로 볼 수 있게 `src/docs.rs`에서 싣는다.
   - 기록·로드맵(`notes`), 참고 자료, 기술 채택 판단, 스키마와 식별자, 지원 대상과 명세의 형식화.
   - BMS 문법 초안(ABNF, `docs/bms.abnf`)과 실제 BMS 파일 189개로 한 검증 결과.
-  - 다른 AI에게 리듬게임 채보 포맷·구동기·파서·규격의 기초 조사를 맡기기 위한 지침(`docs/research-brief.md`).
-    BMS 계열뿐 아니라 기타 히어로 계열 chart, osu!, StepMania 등 채보 전반을 범위로 한다.
+  - 다른 AI에게 조사를 맡기는 의뢰서를 `docs/briefs/`에 모았다(색인과 공통 규칙 포함).
+    - B-01 `format-survey`: 리듬게임 채보 포맷·구동기·파서·규격의 기초 조사. BMS 계열뿐 아니라 기타 히어로 계열 chart, osu!, StepMania 등 채보 전반을 범위로 한다.
+    - B-02 `medium-definition`: 매체의 구성과 형식을 사이버미디어 모델 등에 기대어 정의.
+    - B-03 `copyright`: 저작권과 재배포 쟁점 조사.
+    - B-04 `preservation-p2p`: p2p망에서 "열람만"이 가능한지, 보존 수준의 기준.
 
 ### Changed
 

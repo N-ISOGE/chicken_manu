@@ -46,9 +46,9 @@ Chicken Menu, 치킨메뉴, ... : 리듬게임·음악게임의 매체를 조사
 
 | 방향 | 문서 |
 | --- | --- |
-| 1. 형식 조사 | [`formats.md`](docs/formats.md), [`references.md`](docs/references.md), [`research-brief.md`](docs/research-brief.md), [`bms-parsers.md`](docs/bms-parsers.md) |
+| 1. 형식 조사 | [`formats.md`](docs/formats.md), [`references.md`](docs/references.md), [`bms-parsers.md`](docs/bms-parsers.md) |
 | 2. 도구의 명세와 구현 | [`schema.md`](docs/schema.md), [`bms-grammar.md`](docs/bms-grammar.md), [`adoption.md`](docs/adoption.md) |
-| 공통 | [`notes.md`](docs/notes.md)(로드맵), [`change_log.md`](change_log.md) |
+| 공통 | [`notes.md`](docs/notes.md)(로드맵), [`briefs/`](docs/briefs/index.md)(다른 AI에게 맡기는 조사 의뢰서), [`change_log.md`](change_log.md) |
 
 ## 기타 사항
 
