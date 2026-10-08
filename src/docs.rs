@@ -14,7 +14,19 @@ pub mod changelog {}
 pub mod notes {}
 
 #[doc = include_str!("../docs/references.md")]
-pub mod references {}
+pub mod references {
+    #[doc = include_str!("../docs/references/bms.md")]
+    pub mod bms {}
+
+    #[doc = include_str!("../docs/references/standards.md")]
+    pub mod standards {}
+
+    #[doc = include_str!("../docs/references/charts.md")]
+    pub mod charts {}
+
+    #[doc = include_str!("../docs/references/preservation.md")]
+    pub mod preservation {}
+}
 
 #[doc = include_str!("../docs/adoption.md")]
 pub mod adoption {}
@@ -23,7 +35,16 @@ pub mod adoption {}
 pub mod schema {}
 
 #[doc = include_str!("../docs/formats.md")]
-pub mod formats {}
+pub mod formats {
+    #[doc = include_str!("../docs/formats/chart-units.md")]
+    pub mod chart_units {}
+
+    #[doc = include_str!("../docs/formats/commercial.md")]
+    pub mod commercial {}
+
+    #[doc = include_str!("../docs/formats/ledger-proposals.md")]
+    pub mod ledger_proposals {}
+}
 
 #[doc = include_str!("../docs/bms-grammar.md")]
 #[doc = concat!("```abnf\n", include_str!("../docs/bms.abnf"), "\n```")]

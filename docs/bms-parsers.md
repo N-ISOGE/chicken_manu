@@ -66,6 +66,11 @@
 - 순서: BOM(UTF-32BE, UTF-32LE, UTF-8, UTF-16BE, UTF-16LE)을 먼저 보고, BOM이 없으면
   EUC-KR → MS932 → UTF-8 → UTF-16/32 순으로 시험한다. 모두 맞지 않으면 MS932다.
 - 읽기는 `new InputStreamReader(new ByteArrayInputStream(data), encoding)`. BOM을 제거하는 코드는 찾지 못했다(코드를 읽고 한 추정, 실행 검증 없음).
+- 참고 시험(2026-10-09, 확인 수준: 부분): 한 PC의 BMS 샘플 189개(ASCII만 85, CP932 96, EUC-KR 8, BOM 0)에서
+  위 판정 순서를 Rust(`encoding_rs`)로 근사해 보았다. jbms-parser를 실행한 결과가 아니라 "엄격 디코딩 + 줄바꿈 또는 `#` 존재 여부"
+  조건으로 흉내 낸 것이다. 근사에서 ASCII만 있는 85개와 비ASCII EUC-KR 8개는 EUC-KR로, CP932 96개는 MS932로 판정됐다.
+  EUC-KR이 ASCII만 있는 파일도 통과시키기 때문이다. 엄격 UTF-8 우선 방식과 라벨이 다른 181개는 모두 디코딩 텍스트가 같았다(텍스트가 다른 파일 0).
+  이 샘플에는 비ASCII UTF-8 파일과 BOM이 있는 파일이 없어서 UTF-8과 BOM 경로는 검증하지 못했다.
 - 파일 해시: MD5 + SHA-256 모두 계산.
 
 #### 지원 커맨드 (CommandWord enum)
@@ -336,6 +341,9 @@ If Channel = "SC" Then .Value = hSCROLL(C36to10(Mid(sLineTrim, xI1, 2)))
 
 `#CHARSET` 헤더를 명시적으로 파싱하는 구현은 bms-js 외에 확인되지 않음.
 
+위 표의 jbms-parser 판정 순서는 소스를 읽은 것이고, 실제 샘플에서의 거동은 근사 시험(2.1 참고 시험)만 있다.
+시험 결과는 단일 PC의 189개 표본이다.
+
 ---
 
 ## 5. 구현 간 차이 및 주의사항
@@ -352,6 +360,10 @@ If Channel = "SC" Then .Value = hSCROLL(C36to10(Mid(sLineTrim, xI1, 2)))
 | BMSE        |  ○   | `OBJ_CH.CH_SCROLL(1020)` 채널, `Case "#SCROLL"` 분기         |
 | iBMSC       |  ×   | —                                                            |
 | μBMSC       |  ○   | `hSCROLL(1295)` 배열, 채널 `SC`                              |
+
+위 표의 bms-js ×는 파서 소스를 읽은 결과다. 한편 Bemuse에는 지원 문서와 별도로 공식 "Bemuse's BMS Extensions" 페이지가 있고,
+다른 AI의 조사(2026-10-09)가 본 검색 발췌에는 `#SCROLL01`, `#SCROLL02`, `#SPEED01`이 나온다. 본문을 열지 못했고 이 확장이 bms-js 파서에 구현돼 있는지도
+모르므로 위 표를 바꾸지 않는다(미확인, 재조사 필요). `#SPEED01`은 이 문서에 없는 이름이다.
 
 `bms.ebnf`의 `timing_header`에서 `#SCROLLxx` 반영 여부는 별도 판단이 필요함.
 복수의 주요 구현(jbms-parser, BMSE, μBMSC)에서 지원하므로 사실상 비공식 표준으로
@@ -379,3 +391,10 @@ BMSE는 `#RANDOM`의 오타 변형인 `#RONDAM`도 처리함.
 
 - iBMSC는 `#DEFEXRANK` 분기 없이 `#EXRANK`로 처리.
 - μBMSC는 `#DEFEXRANK`를 명시적으로 지원.
+
+### MS932(cp932)와 엄격 Shift_JIS
+
+- 위 샘플 189개에서는 두 디코딩 결과가 같았다(차이 나는 파일 0). 웨이브 대시(`0x8160`)와 NEC 13행(`0x8790`)이 샘플에 없었다.
+- 두 바이트가 나오는 샘플 밖 파일에서는 결과가 갈릴 수 있다(`0x8160`은 cp932에서 U+FF5E, JIS X 0208 Shift_JIS에서 U+301C).
+- 기본값 MS932를 정책으로 삼을 근거가 충분한지는 아직 판단하지 않았다(표본 한 개, 단일 PC).
+- 미확인: Java의 EUC-KR이 `0xA4D4`(한글 채움 문자)를 받아들이는지, 혼합 인코딩 파일, 64KB를 넘는 파일에서의 표본 판정 차이.
