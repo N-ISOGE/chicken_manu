@@ -32,3 +32,6 @@ jobs:
         env:
           # To report GitHub Actions status checks
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # 마크다운 서식(prettier)은 고치는 파일부터 점진적으로 맞춘다.
+          # 모든 md가 맞춰지면 이 줄을 지워 다시 켠다. (docs/notes.md "작업 방식" 참고)
+          VALIDATE_MARKDOWN_PRETTIER: false

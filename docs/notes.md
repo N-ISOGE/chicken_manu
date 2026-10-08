@@ -15,6 +15,24 @@
 
 - rust 기반으로 작성.
 
+## 작업 방식
+
+### Git
+
+- 브랜치는 `main`과 `dev` 두 개를 기본으로 한다.
+  - `dev`: 통합용. 직접 푸시할 수 없고 PR로만 바꾼다.
+  - `main`: 릴리스용. 다른 브랜치 작업이 끝난 뒤 `dev`에서 반영하기로 하고 지금은 멈춰 둔다.
+- 작업은 `dev`에서 딴 **짧게 쓰고 지우는 브랜치**에서 하고, 끝나면 PR로 `dev`에 넣는다.
+- 오래된 브랜치(`util-for-parsing`, `wrapper-bms-to-mets`, `add-reference`)는 이어 쓰지 않는다.
+  내용은 PR로 `dev`에 들어가고, 그 뒤에 정리한다.
+
+### 마크다운 서식
+
+- md는 prettier(3.3.3)로 맞춘다: `npx prettier@3.3.3 --write <파일>`.
+- 전체를 한 번에 바꾸지 않고 **고치는 파일부터** 맞춘다. 서식 검사(`MARKDOWN_PRETTIER`)는 모든 파일이 맞춰질 때까지 워크플로에서 끈다.
+- 아직 맞추지 않은 파일은 `npx prettier@3.3.3 --check "**/*.md"`로 볼 수 있다.
+  맞춘 파일: `docs/bms-parsers.md`.
+
 ## 문제들
 
 이거가 있었나? -> BMSSearch  

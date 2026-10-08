@@ -1,4 +1,5 @@
 <!-- markdownlint-disable MD024 -->
+
 # BMS 파서 구현 정리
 
 이 문서는 BMS 형식을 실제로 파싱하는 주요 도구 및 구동기의 구현을 정리한 것입니다.
@@ -25,14 +26,14 @@
 
 ## 1. 대상 목록
 
-| 도구 | 종류 | 언어 | 저장소 |
-|------|------|------|--------|
-| [jbms-parser] | 구동기 파서 (Beatoraja) | Java | <https://github.com/exch-bms2/jbms-parser> |
-| [bms-js] | 구동기 파서 (Bemuse) | TypeScript | <https://github.com/bemusic/bemuse/tree/master/packages/bms> |
-| [BMSE] | 편집기 | VB.NET | <https://github.com/Nekokan/BMSE> |
-| [iBMSC] | 편집기 | VB.NET | <https://github.com/aqtq314/iBMSC> |
-| [μBMSC] | 편집기 (iBMSC 포크) | VB.NET | <https://github.com/zardoru/iBMSC> |
-| [Qwilight] | 구동기 | — | <https://taehui.ddns.net/ko> (소스 비공개) |
+| 도구          | 종류                    | 언어       | 저장소                                                       |
+| ------------- | ----------------------- | ---------- | ------------------------------------------------------------ |
+| [jbms-parser] | 구동기 파서 (Beatoraja) | Java       | <https://github.com/exch-bms2/jbms-parser>                   |
+| [bms-js]      | 구동기 파서 (Bemuse)    | TypeScript | <https://github.com/bemusic/bemuse/tree/master/packages/bms> |
+| [BMSE]        | 편집기                  | VB.NET     | <https://github.com/Nekokan/BMSE>                            |
+| [iBMSC]       | 편집기                  | VB.NET     | <https://github.com/aqtq314/iBMSC>                           |
+| [μBMSC]       | 편집기 (iBMSC 포크)     | VB.NET     | <https://github.com/zardoru/iBMSC>                           |
+| [Qwilight]    | 구동기                  | —          | <https://taehui.ddns.net/ko> (소스 비공개)                   |
 
 [jbms-parser]: https://github.com/exch-bms2/jbms-parser
 [bms-js]: https://github.com/bemusic/bemuse/tree/master/packages/bms
@@ -97,14 +98,14 @@
 
 정규식 기반 매처 (`compiler/index.ts`):
 
-| 패턴 | 처리 |
-|------|------|
-| `#RANDOM \d+` | 제어흐름 — 난수 범위 설정 |
-| `#IF \d+` | 제어흐름 — 조건 분기 |
-| `#ENDIF` | 제어흐름 — 분기 종료 |
-| `#DDD02:\S+` | 박자 변경 (measure 02 채널) |
-| `#DDD\S\S:\S+` | 채널 데이터 |
-| `#\w+ \S+` | 헤더 (`chart.headers.set(key, value)`) |
+| 패턴           | 처리                                   |
+| -------------- | -------------------------------------- |
+| `#RANDOM \d+`  | 제어흐름 — 난수 범위 설정              |
+| `#IF \d+`      | 제어흐름 — 조건 분기                   |
+| `#ENDIF`       | 제어흐름 — 분기 종료                   |
+| `#DDD02:\S+`   | 박자 변경 (measure 02 채널)            |
+| `#DDD\S\S:\S+` | 채널 데이터                            |
+| `#\w+ \S+`     | 헤더 (`chart.headers.set(key, value)`) |
 
 - 헤더를 `Map<string, string>`으로 저장 (타입 검증 없음).
 - DTX 형식도 지원 (`:` 구분자 방식).
@@ -205,13 +206,13 @@ iBMSC에서 파생된 포크. 파싱 구조는 거의 동일하나 다음 차이
 
 #### iBMSC와의 주요 차이
 
-| 항목 | iBMSC | μBMSC |
-|------|-------|-------|
-| `#SCROLLxx` | 미지원 | **지원** (`hSCROLL` 배열, `SC` 채널) |
-| `#BMP` | 미지원 | **지원** (`hBMP` 배열) |
-| `#DEFEXRANK` | `#EXRANK`로 처리 | `#DEFEXRANK` 명시 지원 |
-| 기본 인코딩 | `Encoding.Default` | `Encoding.UTF8` |
-| BPM/STOP 클램프 | 있음 | 없음 ("No limits on BPM editing") |
+| 항목            | iBMSC              | μBMSC                                |
+| --------------- | ------------------ | ------------------------------------ |
+| `#SCROLLxx`     | 미지원             | **지원** (`hSCROLL` 배열, `SC` 채널) |
+| `#BMP`          | 미지원             | **지원** (`hBMP` 배열)               |
+| `#DEFEXRANK`    | `#EXRANK`로 처리   | `#DEFEXRANK` 명시 지원               |
+| 기본 인코딩     | `Encoding.Default` | `Encoding.UTF8`                      |
+| BPM/STOP 클램프 | 있음               | 없음 ("No limits on BPM editing")    |
 
 #### SCROLL 구현 상세
 
@@ -245,93 +246,93 @@ If Channel = "SC" Then .Value = hSCROLL(C36to10(Mid(sLineTrim, xI1, 2)))
 
 ### 메타데이터 헤더
 
-| 커맨드 | jbms-parser | bms-js | BMSE | iBMSC | μBMSC |
-|--------|:-----------:|:------:|:----:|:-----:|:-----:|
-| `#TITLE` | ○ | ○ | ○ | ○ | ○ |
-| `#SUBTITLE` | ○ | ○ | × | ○ | ○ |
-| `#ARTIST` | ○ | ○ | ○ | ○ | ○ |
-| `#SUBARTIST` | ○ | ○ | × | ○ | ○ |
-| `#GENRE` | ○ | ○ | ○ | ○ | ○ |
-| `#MAKER` | × | ○ | × | × | × |
-| `#COMMENT` | △ (stub) | ○ | ○ | ○ | ○ |
+| 커맨드       | jbms-parser | bms-js | BMSE | iBMSC | μBMSC |
+| ------------ | :---------: | :----: | :--: | :---: | :---: |
+| `#TITLE`     |      ○      |   ○    |  ○   |   ○   |   ○   |
+| `#SUBTITLE`  |      ○      |   ○    |  ×   |   ○   |   ○   |
+| `#ARTIST`    |      ○      |   ○    |  ○   |   ○   |   ○   |
+| `#SUBARTIST` |      ○      |   ○    |  ×   |   ○   |   ○   |
+| `#GENRE`     |      ○      |   ○    |  ○   |   ○   |   ○   |
+| `#MAKER`     |      ×      |   ○    |  ×   |   ×   |   ×   |
+| `#COMMENT`   |  △ (stub)   |   ○    |  ○   |   ○   |   ○   |
 
 ### 파일 헤더
 
-| 커맨드 | jbms-parser | bms-js | BMSE | iBMSC | μBMSC |
-|--------|:-----------:|:------:|:----:|:-----:|:-----:|
-| `#WAVxx` | ○ | ○ | ○ | ○ | ○ |
-| `#BMPxx` | ○ | ○ | × | × | ○ |
-| `#STAGEFILE` | ○ | ○ | × | ○ | ○ |
-| `#BANNER` | ○ | ○ | × | ○ | ○ |
-| `#BACKBMP` | ○ | ○ | × | ○ | ○ |
-| `#PREVIEW` | ○ | ○ | × | × | × |
-| `#EXWAVxx` | × | ○ | × | × | × |
-| `#EXBMPxx` | × | ○ | × | × | × |
-| `#VIDEOFILE` | × | ○ | × | × | × |
-| `#MIDIFILE` | × | △ | × | × | × |
-| `#PATH_WAV` | × | × | × | × | × |
-| `#MATERIALSWAV` | × | × | × | × | × |
-| `#MATERIALSBMP` | × | × | × | × | × |
-| `#CDDA` | × | × | × | × | × |
+| 커맨드          | jbms-parser | bms-js | BMSE | iBMSC | μBMSC |
+| --------------- | :---------: | :----: | :--: | :---: | :---: |
+| `#WAVxx`        |      ○      |   ○    |  ○   |   ○   |   ○   |
+| `#BMPxx`        |      ○      |   ○    |  ×   |   ×   |   ○   |
+| `#STAGEFILE`    |      ○      |   ○    |  ×   |   ○   |   ○   |
+| `#BANNER`       |      ○      |   ○    |  ×   |   ○   |   ○   |
+| `#BACKBMP`      |      ○      |   ○    |  ×   |   ○   |   ○   |
+| `#PREVIEW`      |      ○      |   ○    |  ×   |   ×   |   ×   |
+| `#EXWAVxx`      |      ×      |   ○    |  ×   |   ×   |   ×   |
+| `#EXBMPxx`      |      ×      |   ○    |  ×   |   ×   |   ×   |
+| `#VIDEOFILE`    |      ×      |   ○    |  ×   |   ×   |   ×   |
+| `#MIDIFILE`     |      ×      |   △    |  ×   |   ×   |   ×   |
+| `#PATH_WAV`     |      ×      |   ×    |  ×   |   ×   |   ×   |
+| `#MATERIALSWAV` |      ×      |   ×    |  ×   |   ×   |   ×   |
+| `#MATERIALSBMP` |      ×      |   ×    |  ×   |   ×   |   ×   |
+| `#CDDA`         |      ×      |   ×    |  ×   |   ×   |   ×   |
 
 ### 타이밍 헤더
 
-| 커맨드 | jbms-parser | bms-js | BMSE | iBMSC | μBMSC |
-|--------|:-----------:|:------:|:----:|:-----:|:-----:|
-| `#BPM` (초기값) | ○ | ○ | ○ | ○ | ○ |
-| `#BPMxx` | ○ | ○ | ○ | ○ | ○ |
-| `#BASEBPM` | × | × | × | × | × |
-| `#STOPxx` | ○ | ○ | ○ | ○ | ○ |
-| `#STP` | × | × | × | × | × |
-| **`#SCROLLxx`** | **○** | × | **○** | × | **○** |
+| 커맨드          | jbms-parser | bms-js | BMSE  | iBMSC | μBMSC |
+| --------------- | :---------: | :----: | :---: | :---: | :---: |
+| `#BPM` (초기값) |      ○      |   ○    |   ○   |   ○   |   ○   |
+| `#BPMxx`        |      ○      |   ○    |   ○   |   ○   |   ○   |
+| `#BASEBPM`      |      ×      |   ×    |   ×   |   ×   |   ×   |
+| `#STOPxx`       |      ○      |   ○    |   ○   |   ○   |   ○   |
+| `#STP`          |      ×      |   ×    |   ×   |   ×   |   ×   |
+| **`#SCROLLxx`** |    **○**    |   ×    | **○** |   ×   | **○** |
 
 ### 게임플레이 헤더
 
-| 커맨드 | jbms-parser | bms-js | BMSE | iBMSC | μBMSC |
-|--------|:-----------:|:------:|:----:|:-----:|:-----:|
-| `#PLAYER` | ○ | ○ | ○ | ○ | ○ |
-| `#RANK` | ○ | ○ | ○ | ○ | ○ |
-| `#DEFEXRANK` | ○ | ○ | × | △ (`#EXRANK`) | ○ |
-| `#DIFFICULTY` | ○ | ○ | × | ○ | ○ |
-| `#PLAYLEVEL` | ○ | ○ | ○ | ○ | ○ |
-| `#LNOBJ` | ○ | ○ | × | ○ | ○ |
-| `#LNTYPE` | ○ | × | × | × (주석) | × (주석) |
+| 커맨드        | jbms-parser | bms-js | BMSE |     iBMSC     |  μBMSC   |
+| ------------- | :---------: | :----: | :--: | :-----------: | :------: |
+| `#PLAYER`     |      ○      |   ○    |  ○   |       ○       |    ○     |
+| `#RANK`       |      ○      |   ○    |  ○   |       ○       |    ○     |
+| `#DEFEXRANK`  |      ○      |   ○    |  ×   | △ (`#EXRANK`) |    ○     |
+| `#DIFFICULTY` |      ○      |   ○    |  ×   |       ○       |    ○     |
+| `#PLAYLEVEL`  |      ○      |   ○    |  ○   |       ○       |    ○     |
+| `#LNOBJ`      |      ○      |   ○    |  ×   |       ○       |    ○     |
+| `#LNTYPE`     |      ○      |   ×    |  ×   |   × (주석)    | × (주석) |
 
 ### 게이지 / 볼륨 헤더
 
-| 커맨드 | jbms-parser | bms-js | BMSE | iBMSC | μBMSC |
-|--------|:-----------:|:------:|:----:|:-----:|:-----:|
-| `#TOTAL` | ○ | ○ | × | ○ | ○ |
-| `#VOLWAV` | ○ | ○ | × | × | × |
+| 커맨드    | jbms-parser | bms-js | BMSE | iBMSC | μBMSC |
+| --------- | :---------: | :----: | :--: | :---: | :---: |
+| `#TOTAL`  |      ○      |   ○    |  ×   |   ○   |   ○   |
+| `#VOLWAV` |      ○      |   ○    |  ×   |   ×   |   ×   |
 
 ### 제어흐름
 
-| 커맨드 | jbms-parser | bms-js | BMSE | iBMSC | μBMSC |
-|--------|:-----------:|:------:|:----:|:-----:|:-----:|
-| `#RANDOM` | ○ | ○ | ○ | ○ | ○ |
-| `#SETRANDOM` | ○ | × | × | × | × |
-| `#IF` | ○ | ○ | ○ | ○ | ○ |
-| `#ELSEIF` | ○ | × | × | × | × |
-| `#ELSE` | ○ | × | × | × | × |
-| `#ENDIF` | ○ | ○ | ○ | ○ | ○ |
-| `#ENDRANDOM` | ○ | × | × | × | × |
-| `#SWITCH` | ○ | × | × | ○ | ○ |
-| `#SETSWITCH` | × | × | × | ○ | ○ |
-| `#ENDSW` | ○ | × | × | ○ | ○ |
-| `#RONDAM` (오타) | × | × | ○ | × | × |
+| 커맨드           | jbms-parser | bms-js | BMSE | iBMSC | μBMSC |
+| ---------------- | :---------: | :----: | :--: | :---: | :---: |
+| `#RANDOM`        |      ○      |   ○    |  ○   |   ○   |   ○   |
+| `#SETRANDOM`     |      ○      |   ×    |  ×   |   ×   |   ×   |
+| `#IF`            |      ○      |   ○    |  ○   |   ○   |   ○   |
+| `#ELSEIF`        |      ○      |   ×    |  ×   |   ×   |   ×   |
+| `#ELSE`          |      ○      |   ×    |  ×   |   ×   |   ×   |
+| `#ENDIF`         |      ○      |   ○    |  ○   |   ○   |   ○   |
+| `#ENDRANDOM`     |      ○      |   ×    |  ×   |   ×   |   ×   |
+| `#SWITCH`        |      ○      |   ×    |  ×   |   ○   |   ○   |
+| `#SETSWITCH`     |      ×      |   ×    |  ×   |   ○   |   ○   |
+| `#ENDSW`         |      ○      |   ×    |  ×   |   ○   |   ○   |
+| `#RONDAM` (오타) |      ×      |   ×    |  ○   |   ×   |   ×   |
 
 ---
 
 ## 4. 인코딩 처리 비교
 
-| 구현 | 인코딩 처리 방식 |
-|------|----------------|
-| jbms-parser | 기본값 `MS932`. BOM → EUC-KR → MS932 → UTF-8 → UTF-16/32 순으로 64KB 표본을 시험하고 모두 실패하면 MS932 |
-| bms-js | `bemuse-chardet` 자동 감지 + `iconv-lite` 디코딩; hitkey `#CHARSET` 알고리즘 준거; BOM 제거; `forceEncoding` 옵션 |
-| BMSE | Windows 기본 코드페이지 |
-| iBMSC | `System.Text.Encoding.Default` (기본값); 설정 UI에서 변경 가능 |
-| μBMSC | `System.Text.Encoding.UTF8` (기본값); 설정 UI에서 변경 가능 |
-| Qwilight | 소스 비공개 — 확인 불가 |
+| 구현        | 인코딩 처리 방식                                                                                                  |
+| ----------- | ----------------------------------------------------------------------------------------------------------------- |
+| jbms-parser | 기본값 `MS932`. BOM → EUC-KR → MS932 → UTF-8 → UTF-16/32 순으로 64KB 표본을 시험하고 모두 실패하면 MS932          |
+| bms-js      | `bemuse-chardet` 자동 감지 + `iconv-lite` 디코딩; hitkey `#CHARSET` 알고리즘 준거; BOM 제거; `forceEncoding` 옵션 |
+| BMSE        | Windows 기본 코드페이지                                                                                           |
+| iBMSC       | `System.Text.Encoding.Default` (기본값); 설정 UI에서 변경 가능                                                    |
+| μBMSC       | `System.Text.Encoding.UTF8` (기본값); 설정 UI에서 변경 가능                                                       |
+| Qwilight    | 소스 비공개 — 확인 불가                                                                                           |
 
 `#CHARSET` 헤더를 명시적으로 파싱하는 구현은 bms-js 외에 확인되지 않음.
 
@@ -344,13 +345,13 @@ If Channel = "SC" Then .Value = hSCROLL(C36to10(Mid(sLineTrim, xI1, 2)))
 `#SCROLLxx`는 [hitkey BMS command memo](https://hitkey.nekokan.dyndns.info/cmds.htm)에
 수록되어 있지 않으나, 여러 구현에서 실제로 지원하고 있음.
 
-| 구현 | 지원 | 비고 |
-|------|:----:|------|
-| jbms-parser | ○ | `scrolltable: Map<Integer,Double>`, 36진수 인덱스, 음수 허용 |
-| bms-js | × | — |
-| BMSE | ○ | `OBJ_CH.CH_SCROLL(1020)` 채널, `Case "#SCROLL"` 분기 |
-| iBMSC | × | — |
-| μBMSC | ○ | `hSCROLL(1295)` 배열, 채널 `SC` |
+| 구현        | 지원 | 비고                                                         |
+| ----------- | :--: | ------------------------------------------------------------ |
+| jbms-parser |  ○   | `scrolltable: Map<Integer,Double>`, 36진수 인덱스, 음수 허용 |
+| bms-js      |  ×   | —                                                            |
+| BMSE        |  ○   | `OBJ_CH.CH_SCROLL(1020)` 채널, `Case "#SCROLL"` 분기         |
+| iBMSC       |  ×   | —                                                            |
+| μBMSC       |  ○   | `hSCROLL(1295)` 배열, 채널 `SC`                              |
 
 `bms.ebnf`의 `timing_header`에서 `#SCROLLxx` 반영 여부는 별도 판단이 필요함.
 복수의 주요 구현(jbms-parser, BMSE, μBMSC)에서 지원하므로 사실상 비공식 표준으로
