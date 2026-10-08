@@ -45,6 +45,10 @@
 | 원문 참조 이름이 남지 않는다 | 연결 테이블은 `file_id`와 `relative_path`만 보관 | `#WAV01 kick.wav`가 실제로 `kick.ogg`로 해석되는 경우(확장자 대체)와 대소문자 차이를 복원할 수 없다. [BMS 문법](crate::docs::bms_grammar)의 `file-ref-command`가 (헤더, 인덱스, 원문 경로)를 내므로 보관할지 정해야 한다 |
 | `format_property`·`encoding_property`로는 BMS 텍스트를 구분하기 어렵다 | libmagic이 BMS 내용을 인식하는지는 시험하지 않았다 | 확장자와 문법 적합도(알려진 명령 비율)로 판별하는 방법이 있다 |
 
+`print_file_row`가 만드는 CSV는 파일명 필드를 큰따옴표로 감싸고 내부 큰따옴표를 두 번 쓴다(RFC 4180).
+파일명에 쉼표가 있어도 열 수가 바뀌지 않게 하려는 것이다. `LOAD DATA`로 적재하는 설정도 이 인용 규칙에 맞아야 한다.
+정확한 옵션(`ENCLOSED BY`, 기본 이스케이프 문자와 Windows 경로의 `\`)은 MariaDB 문서로 확인하지 못했다(`미확인`).
+
 정리: 최소한 **MD5 + SHA-256(원시 바이트) + SHA3-256 + CID(프로파일 이름 포함)** 를 한 파일에 대해 보관할 수 있어야 BMS 생태계와 IPFS를 함께 지원한다.
 이를 위한 구조 변경(예: 파일-다이제스트 연결 테이블, binder CID, 참조 이름)은 아직 결정하지 않았다.
 
