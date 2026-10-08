@@ -28,6 +28,7 @@
 
 ### Changed
 
+- `README.md`를 정리했다. "매체"라는 용어를 정의하고, 목적을 두 방향(매체의 형식 조사, 공유·보존 도구의 명세와 구현)으로 나눴다.
 - `change_log.md`를 버전별 변동사항 요약 문서로 바꿨다.
   로드맵과 문제들은 `docs/notes.md`로, 참고 자료는 `docs/references.md`로, BMS 문법 초안은 `docs/bms-grammar.md`로 옮겼다.
 - `src/main.rs`: 크레이트 문서를 `docs/index.md`에서 가져오고 `docs` 모듈을 선언했다.
