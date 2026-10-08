@@ -1,16 +1,16 @@
 ---
 name: Lint
 
-on:  # yamllint disable-line rule:truthy
+on: # yamllint disable-line rule:truthy
   push: null
   pull_request: null
 
-permissions: { }
+permissions: {}
 
 jobs:
   build:
     name: Lint
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     permissions:
       contents: read
@@ -20,15 +20,18 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
+          persist-credentials: false
           # super-linter needs the full git history to get the
           # list of files that changed across commits
           fetch-depth: 0
 
       - name: Super-linter
-        uses: super-linter/super-linter@v6.8.0  # x-release-please-version
+        uses: super-linter/super-linter@4ce20838b8ab83717e78138c5b3a1407148e0918 # v8.7.0
         env:
           # To report GitHub Actions status checks
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-...
+          # 마크다운 서식(prettier)은 고치는 파일부터 점진적으로 맞춘다.
+          # 모든 md가 맞춰지면 이 줄을 지워 다시 켠다. (docs/notes.md "작업 방식" 참고)
+          VALIDATE_MARKDOWN_PRETTIER: false

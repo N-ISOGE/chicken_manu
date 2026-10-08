@@ -4,3 +4,9 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+encoding_rs = "^0.8.34"
+log = "^0.4.22"
+test-log = "^0.2.16"
+regex = "^1.10.6"
+sha3 = "0.11.0-pre.4"
+magic = "0.16.2"

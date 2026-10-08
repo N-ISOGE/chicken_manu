@@ -1,163 +1,80 @@
-# 기록
+<!-- markdownlint-disable MD024 -->
+# 변경 기록
 
-## 로드맵
+이 문서는 [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/) 형식과
+[유의적 버전 2.0.0](https://semver.org/lang/ko/)을 따라 버전별 변동사항을 요약한다.
 
-### 스키마 정의하기
+## 버전 규칙
 
-- [METS]에서 파생시켜서 메타데이터에 대한 스키마를 직접 최신화하는 부분을 줄임.
-    - xml, encoding은 UTF-8로.
+- 아직 공개 API와 호환성 기준이 정해지지 않았으므로 **패치 번호만 올린다**(`0.1.x`).
+- 마이너와 메이저는 공개 API나 데이터 형식(메타데이터 스키마)이 정해진 뒤에 올린다.
+- 변경은 `Added`, `Changed`, `Deprecated`, `Removed`, `Fixed`, `Security`로 나눠 적는다.
+- 로드맵과 풀어야 할 문제들은 이 문서가 아니라 `docs/notes.md`에 있다.
+  이전 `change_log.md`의 시간 기반 기록은 아래 버전별 기록으로 대체했다.
 
-### 관리, 공유 및 배포 도구 작성
+`0.1.0` 이후의 버전 번호는 이 문서를 바꾸면서 Git 기록을 보고 소급해 붙인 것이다. 태그는 없다.
+`Cargo.toml`의 버전은 아직 `0.1.0`이다.
 
-- rust 기반으로 작성.
+## Unreleased
 
-## 시간 기반 기록
+다음 릴리스는 `0.1.3`이 된다.
 
-##### 2024-07-11
+### Added
 
-- idx 환경 파일 작성
-    - rust랑 markup 언어 관련 설정
-- readme, log 작성
-    - 기본적인 기록 작성
+- `docs/`에 조사 문서를 추가하고 `cargo doc`으로 볼 수 있게 `src/docs.rs`에서 싣는다.
+  - 기록·로드맵(`notes`), 참고 자료, 기술 채택 판단, 스키마와 식별자, 지원 대상과 명세의 형식화.
+  - BMS 문법 초안(ABNF, `docs/bms.abnf`)과 실제 BMS 파일 189개로 한 검증 결과.
 
-## 의미 기반 기록
+### Changed
 
-### 문제들
+- 린트 워크플로 폴더 이름의 오타를 고쳤다(`.github/workflow` → `.github/workflows`). GitHub Actions는 `workflows`만 읽는다.
+- 린트 워크플로를 갱신했다. `actions/checkout` v4→v6(Node 20 지원 중단 경고), super-linter v6.8.0→v8.7.0, `ubuntu-latest`→`ubuntu-24.04`(2026-10-19부터 `ubuntu-latest`가 Ubuntu 26으로 바뀐다).
+- 워크플로의 액션을 커밋 SHA로 고정하고 `persist-credentials: false`를 설정했다(zizmor 지적). codespell 설정(`.github/linters/.codespellrc`)을 추가했다.
+- `src/main.rs`: 코드 검토(Copilot) 지적과 린트를 반영해 다시 정리했다.
+  - `ipfs`를 셸(`pwsh -Command`) 없이 직접 실행하고 경로를 별도 인자로 넘긴다(파일명으로 명령이 실행될 수 있던 문제). 종료 상태와 CID 출력을 확인하고, 실행 파일은 `CHICKEN_MANU_IPFS`로 바꿀 수 있다.
+  - libmagic은 하드코딩한 `D:/Tool/magic` 대신 시스템 기본 DB를 쓴다(`MAGIC` 환경 변수로 변경).
+  - 읽기 버퍼를 길이 0으로 만들어 첫 줄이 NUL로 손상되던 문제를 고쳤다. 파일명은 `file_stem()`으로 구하고, 결과 폴더가 없으면 만든다.
+  - 디렉터리나 읽을 수 없는 파일은 패닉 대신 `BMSReadError`로 돌려준다. `ToolFailure` 오류를 추가했다.
+  - CSV의 파일명 필드를 인용한다.
+  - 테스트가 임시 폴더에서 입력 파일을 직접 만들어 쓰고(ASCII, Shift-JIS, 잘못된 인코딩, 없는 파일, 디렉터리, CSV 인용), `rustfmt`와 clippy 경고를 정리했다.
+- JSCPD(중복 코드 검사)가 prettier로 정렬한 마크다운 표 두 개를 복제로 잘못 잡아서, 마크다운을 검사 대상에서 뺐다(`.github/linters/.jscpd.json`). 코드(Rust 등)는 계속 검사한다.
+- 다른 AI에게 맡기는 조사 의뢰서(B-01~B-05)를 저장소에서 드라이브 "2026년도 / 메세지 큐"로 옮기고 `docs/briefs/`를 지웠다. 큐의 노드 형식에 맞춰 PA6(매체 정의), PB3(보존 메타데이터 표준), PB4(저작권·재배포 쟁점), PB5(보존 수준·p2p 열람)와 기초 조사 지침 자료 노드로 올렸다. 메타데이터는 "형식을 직접 만들지 않고 표준을 따른다"는 방침을 `docs/notes.md`와 `docs/index.md`에 되살렸다.
+- 마크다운 서식(prettier) 검사를 끄고(`VALIDATE_MARKDOWN_PRETTIER: false`) 고치는 파일부터 점진적으로 맞추기로 했다. `docs/bms-parsers.md`를 맞춰 표 스타일(MD060) 지적을 없앴다. 작업 방식(브랜치, 서식)을 `docs/notes.md`에 적었다.
+- 린트가 지적한 문서의 용어 표기, 맨몸 URL을 고쳤다. 제목이 반복되는 `change_log.md`와 `docs/bms-parsers.md`는 파일 안에서만 MD024를 껐다.
+- `Cargo.toml`: Cargo가 무시하던 `[env]` 항목을 지웠다.
+- `README.md`를 정리했다. "매체"와 "에셋"을 정의하고(에셋은 매체가 참조하는 파일로 매체 바깥), 목적을 두 방향(매체의 형식 조사, 공유·보존 도구의 명세와 구현)으로 나눴다.
+- `docs/index.md`: "표현"을 "매체"로 바꾸고 용어 절을 추가했다. 열린 결정에 사용자가 밝힌 방향(매체 정의와 저작권 검토는 다른 AI에게 위임, 도서관식 목록 관리, libp2p 기반 IPFS 후보와 추가 조사, 포맷 사이의 변환은 나중에)을 적었다.
+- `change_log.md`를 버전별 변동사항 요약 문서로 바꿨다.
+  로드맵과 문제들은 `docs/notes.md`로, 참고 자료는 `docs/references.md`로, BMS 문법 초안은 `docs/bms-grammar.md`로 옮겼다.
+- `src/main.rs`: 크레이트 문서를 `docs/index.md`에서 가져오고 `docs` 모듈을 선언했다.
 
-이거가 있었나? -> BMSSearch  
-이거 남아있긴 한건가? -> ?  
-이 파일이 맞나? -> BMSSearch로는 부족  
-이거를 뭐라 부르냐 -> 패턴이랑 관련 파일들?
+## 0.1.2 - 2024-08-09
 
-### 참고할 것들
+### Added
 
-#### [METS]
+- BMS 문법 초안(EBNF)을 적기 시작했다. 주석(`;`, `//`, `/* */`)을 고려했다.
+- 참고 구동기에 Qwilight를 추가했다. 구동기를 추가하는 대신 구현을 보고 정리하는 방침을 기록했다.
 
-- 스키마 참고
+### Changed
 
-[METS]: https://www.loc.gov/standards/mets/mets-home.html
+- 기록 문서의 구성을 정리했다.
 
-#### [IPFS]
+## 0.1.1 - 2024-08-06
 
-- 배포 및 공유 기반
+### Added
 
-**[IPFS] 구현**
+- BMS 항목: hitkey BMS command memo의 헤더 분류(패턴 정보용, 파일 정보용)와 고려할 점.
+- BMSE가 대응하지 않는 header 목록.
+- iBMSC와 μBMSC의 BMS 읽는 부분(`OpenBMS`, `SaveBMS`)과 다루는 header.
+- `add-reference` 브랜치를 `dev`에 병합(#4).
 
-- [iroh](https://iroh.computer/docs)
-    - [iroh-rust](https://crates.io/crates/iroh)
-- [rust-ipfs](https://crates.io/crates/rust-ipfs)
+## 0.1.0 - 2024-08-05
 
-[IPFS]: https://docs.ipfs.tech/
+### Added
 
-### BMS
-
-#### 개요
-
-bms 파일 하나와 연관된 파일들을 묶어서 관리함.
-
-#### 여러 사양들
-
-##### [hitkey BMS command memo]
-
-과거 기록들: [hitkey 2014 archive]  
-현재 반영: [hitkey 2014 archive]
-
-여러 관련 도구와 구동기들의 사양을 기반으로 정리함.
-
----
-
-**패턴 정보용 header**
-
-`#TITLE`, `#ARTIST`, ...
-
-**파일 정보용 header**
-
-`#WAVXX`, `#EXWAVXX`, `#MIDIFILE`  
-`#PATH_WAV`  
-`#BMPXX`, `#EXBMPXX`, `#VIDEOFILE`, `#MOVIE`, `#BACKBMP`, `#CHARFILE`  
-`#STAGEFILE`, `#BANNER`  
-
-MATERIAL 계열 header를 쓴 bms가 있나?
-
-**고려할 점**
-
-header 중복되면 EOL에 가까운, 뒤에 나온 header를 반영함.
-
-- 예외도 있음 :
-    - 메타데이터에선 `#SUBTITLE`, `#SUBARTIST` 등...
-    - 파일 처리에선 고려하지 않음.
-
-Comment 처리?
-
-- `;`, `//`, (`/*`, `*/`)
-
-소리 파일이 다른데 패턴 파일이 같은 경우를 다르게 등록시켜야 할 점.
-
-
-[hitkey BMS command memo]: https://hitkey.nekokan.dyndns.info/cmds.htm
-
-[hitkey 2014 archive]: https://web.archive.org/web/20240505175610/https://hitkey.nekokan.dyndns.info/cmds.htm
-
-#### 관련 도구 및 구동기
-
-##### **BMSE**
-
-여기서 대응 안하는 header
-
-- 파일 관련
-    - `#BANNER`, `#BACKBMP`, `#EXBMPzz`, `#VIDEOFILE`, `#CHARFILE`
-    - `#MIDIFILE`, `#EXWAVzz`, `#PREVIEW`
-    - `#MATERIALSWAV`, `#MATERIALSBMP`, `#PATH_WAV`
-    - `#CDDA`
-- 메타데이터 관련
-    - `#SUBTITLE`, `#SUBARTIST`, `#MAKER`
-
-관련 링크
-
-- [site](http://ucn.tokonats.net/software/bmse/)
-- [github](https://github.com/Nekokan/BMSE)
-
-##### **iBMSC**
-
-관련 링크
-
-- [github](https://github.com/aqtq314/iBMSC)
-
-BGA 대신할 것이 있는 쪽을 지원하는 목적이라 `#BMP`을 뺌.
-
-`source/iBMSC/iBMSC/Form1.vb`
-
-- `Private Sub OpenBMS(ByVal As String)`
-- `Private Function SaveBMS() As String`
-    - 메타데이터 관련: `#TITLE`, `#ARTIST`, `#SUBTITLE`, `#SUBARTIST`
-    - 파일 정보 관련: `#STAGEFILE`, `#BANNER`, `#BACKBMP`, `#WAV`
-
-##### **μBMSC**
-
-관련 링크
-
-- [github]([https://github.com/zardoru/iBMSC)
-
-iBMSC와 비슷하게 `#BMP`을 뺌
-
-`iBMSC/ChartIO.vb`
-
-- `Private Sub OpenBMS(ByVal As String)`
-    - 메타데이터 관련: `#TITLE`, `#ARTIST`, `#SUBTITLE`, `#SUBARTIST`
-    - 파일 정보 관련: `#STAGEFILE`, `#BANNER`, `#BACKBMP`, `#WAV`
-
-##### [Beatoraja]
-
-bms parser: [jbms-parser]
-
-[Beatoraja]: https://github.com/exch-bms2/beatoraja
-
-[jbms-parser]: https://github.com/exch-bms2/jbms-parser
-
-##### [bemuse]
-
-bms parser: [bms-js]
-
-[bms-js]: https://github.com/bemusic/bemuse/tree/master/packages/bms
-
-[bemuse]: https://github.com/bemusic/bemuse
+- 저장소 초기 설정: `README`, `.gitignore`(Rust, JetBrains, Visual Studio Code), Project IDX 환경(`.idx/dev.nix`)(2024-07-11부터).
+- Cargo 패키지 `chicken_manu` 초기화(2024-08-02).
+- 저장소 설정: `CODEOWNERS`, super-linter 린트 워크플로, `CODE_OF_CONDUCT.md`.
+- BMS 파일 읽기: 문자표 기반(비 Unicode) 인코딩을 `encoding_rs`로 해석한다.
+- 테스트 때 볼 로그 출력(`log`, `test-log`)과 함수 오류 형식.
+- 로드맵과 기록 초안(`change_log.md`).

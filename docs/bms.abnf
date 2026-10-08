@@ -1,0 +1,176 @@
+; =====================================================================
+; bms.abnf -- Be-Music Script (.bms .bme .bml .pms) grammar, draft 0.1
+; chicken_manu research draft (2026-10-08). Notation: ABNF, RFC 5234.
+; Quoted strings are case-insensitive (RFC 5234 section 2.3), which is
+; what BMS needs: "command lines are case-insensitive" (hitkey memo).
+;
+; Scope
+;  - Input is TEXT. Byte -> text decoding (BOM, Shift_JIS, EUC-KR, UTF-8,
+;    #CHARSET) is NOT part of this grammar; see the encoding notes.
+;  - Layer 1 (source-line) classifies ONE line. Lines are separated by
+;    CRLF, CR or LF; all three may be mixed in one file.
+;  - Layer 2 (structure) checks block structure over a token stream made
+;    from Layer 1: one token per line, each token followed by one SP.
+;  - Everything that the original spec leaves open is accepted as
+;    generic-command / ignored-line and preserved verbatim.
+; =====================================================================
+
+; ---------------------------------------------------------------------
+; Layer 1: lexical and line grammar
+; ---------------------------------------------------------------------
+
+eol             = CRLF / CR / LF
+non-eol         = %x00-09 / %x0B-0C / %x0E-10FFFF
+
+; a line is a command, a %-meta line or an ignored (comment-like) line
+source-line     = command-line / percent-line / ignored-line
+
+; Any line whose first non-blank char is not '#' is ignored ("All the
+; rest are ignored (use for comments)"). '*' section rulers, '%URL' and
+; ';' or '//' lines in real files fall here.
+ignored-line    = *WSP [ ignored-lead *non-eol ]
+ignored-lead    = %x00-08 / %x0B-0C / %x0E-1F / %x21-22 / %x24-10FFFF
+
+; BMS Manager meta lines: not part of parsing, kept for display only
+percent-line    = *WSP "%" ( "URL" / "EMAIL" ) [ header-sep *non-eol ]
+
+command-line    = *WSP "#" command
+command         = channel-command / header-command
+
+; Strict start rule: only commands this grammar knows. Unknown headers
+; and malformed typed/control lines (e.g. "#RANDOM" without a value) are
+; rejected here but accepted by command-line via generic-command; a
+; reader should treat a typed/control name that only matches
+; generic-command as a diagnostic, not as a silent success.
+known-command-line = *WSP "#" ( channel-command / known-header-command )
+known-header-command = control-command / file-ref-command
+                  / indexed-command / meta-command
+
+; ---- channel sentence:  #xxxCH:data  (xxx = measure 000-999) --------
+channel-command = measure-no ( length-channel / bpm-channel / object-channel )
+measure-no      = 3DIGIT
+length-channel  = "02" ":" real-value          ; length of measure, 1 = 4/4
+bpm-channel     = "03" ":" *( 2HEXDIG )        ; integer BPM, 2 hex digits
+object-channel  = object-channel-id ":" *( object-ref )
+; any 2-char id except 02 (length) and 03 (BPM), which have own value types
+object-channel-id = ( "0" ( "0" / "1" / %x34-39 / %x41-5A / %x61-7A ) )
+                  / ( ( %x31-39 / %x41-5A / %x61-7A ) idx36 )
+object-ref      = 2idx36                       ; "00" = rest
+idx36           = DIGIT / %x41-5A / %x61-7A    ; [0-9A-Za-z], base 36
+
+; ---- header sentence:  #HEADER value ---------------------------------
+header-command  = control-command / file-ref-command / indexed-command
+                  / meta-command / generic-command
+
+header-sep      = 1*WSP
+header-value    = *non-eol                     ; verbatim; trim at use
+
+; unknown or extension header: kept as name + raw value
+generic-command = header-name [ header-sep header-value ]
+header-name     = ( ALPHA / "@" ) *( ALPHA / DIGIT / "_" / "/" )
+                                               ; "/" : #VIDEOf/s, #OCT/FP (hitkey)
+
+; ---- control flow (value is an integer) ------------------------------
+control-command = ( ( "RANDOM" / "SETRANDOM" / "IF" / "ELSEIF"
+                    / "SWITCH" / "SETSWITCH" / "CASE" ) header-sep int-value
+                  / "ENDRANDOM" / "ELSE" / "ENDIF" / "SKIP" / "DEF"
+                  / "ENDSW" ) *WSP
+int-value       = [ "-" ] 1*DIGIT
+real-value      = [ "-" ] ( 1*DIGIT [ "." *DIGIT ] / "." 1*DIGIT )
+
+; ---- headers whose value names a file (the package-relevant ones) ----
+file-ref-command = ( indexed-file-name idx36-pair / plain-file-name )
+                   [ header-sep path-value ]
+indexed-file-name = "WAV" / "BMP"
+idx36-pair      = 2idx36
+plain-file-name = "STAGEFILE" / "BANNER" / "BACKBMP" / "CHARFILE"
+                  / "PREVIEW" / "MIDIFILE" / "VIDEOFILE" / "MOVIE"
+                  / "PATH_WAV" / "MATERIALSWAV" / "MATERIALSBMP"
+path-value      = *non-eol                     ; '\' and '/' both occur
+
+; EXWAV/EXBMP carry parameters before the file name; parameters are not
+; modelled here, the whole value is kept
+ex-file-name    = ( "EXWAV" / "EXBMP" ) 2idx36
+
+; ---- headers that define an indexed slot -----------------------------
+indexed-command = ( ex-file-name header-sep header-value )
+                  / ( ( "BPM" / "EXBPM" / "STOP" / "EXRANK" ) 2idx36
+                      header-sep real-value *WSP )
+                  / ( "TEXT" 2idx36 header-sep header-value )
+                  / ( "LNOBJ" header-sep 2idx36 *WSP )
+                  / ( "STP" header-sep stp-value *WSP )
+stp-value       = 3DIGIT "." 3DIGIT 1*WSP 1*DIGIT   ; measure.fraction ms
+
+; ---- scalar metadata -------------------------------------------------
+meta-command    = ( text-meta-name [ header-sep header-value ] )
+                  / ( number-meta-name header-sep real-value *WSP )
+text-meta-name  = "TITLE" / "SUBTITLE" / "ARTIST" / "SUBARTIST" / "MAKER"
+                  / "GENRE" / "COMMENT" / "PLAYLEVEL" / "CHARSET"
+number-meta-name = "PLAYER" / "RANK" / "DEFEXRANK" / "TOTAL" / "BPM"
+                  / "BASEBPM" / "LNTYPE" / "LNMODE" / "VOLWAV"
+                  / "DIFFICULTY"
+
+; ---------------------------------------------------------------------
+; Layer 2: block structure over line tokens
+; Token alphabet (each token is followed by one SP):
+;   L          any line that is not a control line
+;   RANDOM, SETRANDOM, ENDRANDOM, IF, ELSEIF, ELSE, ENDIF,
+;   SWITCH, SETSWITCH, CASE, DEF, SKIP, ENDSW
+; #RANDOM only sets the random value, so ENDRANDOM is optional (real
+; files omit it); IF..ENDIF and SWITCH..ENDSW must balance and nest.
+; ---------------------------------------------------------------------
+
+structure       = *statement
+statement       = plain / random-stmt / if-block / switch-block
+plain           = "L "
+random-stmt     = ( "RANDOM " / "SETRANDOM " / "ENDRANDOM " )
+if-block        = "IF " *statement
+                  *( "ELSEIF " *statement )
+                  [ "ELSE " *statement ]
+                  "ENDIF "
+switch-block    = ( "SWITCH " / "SETSWITCH " )
+                  *( statement / "CASE " / "DEF " / "SKIP " )
+                  "ENDSW "
+
+
+; ---------------------------------------------------------------------
+; Appendix: what the grammar deliberately does NOT decide
+; (sources: hitkey BMS command memo 2014-07-11, section "Behavior in
+;  general implementation"; checked against 189 real files)
+; ---------------------------------------------------------------------
+; 1. Encoding is not part of the language. Real files here: UTF-8 (85),
+;    CP932/Shift_JIS (96), EUC-KR (8). No BOM was present. Decode first
+;    (BOM, strict UTF-8, strict Shift_JIS, EUC-KR), then apply this
+;    grammar. Always hash the raw bytes, never the decoded text.
+; 2. Duplicates: for the same header the line nearest EOF wins, except
+;    #ExtChr #STP #WAVCMD #OPTION and control flow; #SUBTITLE
+;    #SUBARTIST #COMMENT #LNOBJ may be multiple. Same channel in the same
+;    measure is merged (a later "00" never overwrites), except 01
+;    (BGM), 02 (length: last wins) and A6. Semantics, not syntax.
+; 3. Comments (";" "//" "/* */") are an IIDXv/HDX/outliner extension and
+;    are NOT in the original spec, so they are not in this grammar. Using
+;    them would corrupt any value that contains ";" or "//" (URLs, titles). If a reader supports them, strip them before Layer 1 (comments
+;    take precedence over control syntax). None of the 189 sample files
+;    has ";" "//" or "/*" inside a "#" line.
+; 4. Separator: the spec uses one space. Tab and runs of white space are
+;    accepted here (header-sep = 1*WSP); an omitted separator after a
+;    name is accepted only as an empty value.
+; 5. Indexes are base 36 ([0-9A-Za-z], 1296 slots). Old files use hex
+;    only. "#BASE 62" exists in beatoraja/jbms-parser but is not in the
+;    hitkey memo; this grammar does not model it (idx36 would have to
+;    become idx62, case-sensitive).
+; 6. Not in hitkey but present in the sample files and accepted:
+;    #PREVIEW (13 files) and #LNMODE (13 files), plus the typo
+;    #SUBARTHIST (2 files, falls to generic-command).
+; 7. Real-world noise: "#TOTAL stand by OK" (a non-number in a numeric
+;    header) is accepted by source-line but rejected by
+;    known-command-line; "#05302:.25" (no leading zero) is accepted;
+;    macOS AppleDouble files "._name.bms" are NOT BMS and must be
+;    skipped by name before parsing; '*' ruler lines and '%URL' lines
+;    are ignored text; #RANDOM blocks without #ENDRANDOM occur.
+; 8. Channel 02 uses a decimal, channel 03 a 2-digit HEX integer BPM;
+;    channel 08 (extended BPM) and 09 (STOP) use 2-char indexes into
+;    #BPMxx / #STOPxx, so they are ordinary object channels here.
+; 9. Odd-length or non-alphanumeric channel data (e.g. Shift_JIS art,
+;    "12.375f") is unspecified; a strict reader rejects the line, a
+;    tolerant one skips it. This grammar rejects it in channel-command.
