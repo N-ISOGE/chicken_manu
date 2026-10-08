@@ -69,7 +69,7 @@
 - METS-schema 저장소는 릴리스·태그가 없고 LICENSE 파일이 없으며 마지막 커밋이 2025-03-12다. XSD를 특정 커밋으로 고정해 저장소에 포함하는 것을 권장한다(헤더의 CC0 표기를 인용).
 - 해시 이름 철자는 하나로 정해야 한다. METS 제안 값은 `SHA-256`, IANA는 소문자 `sha3-256`(blake3 없음), CycloneDX는 `SHA3-256`·`BLAKE3`, multicodec은 `sha3-256`(0x16)·`blake3`(0x1e)다.
 - METS 2 profile 문서, 마이그레이션 노트, 예제, 도구는 읽지 못했다.
-- 대안 비교: 처음에는 2차 정보만 있어 제외했다. 2026-10-09에 다른 AI의 조사가 BagIt(RFC 8493)과 OCFL 1.1의 핵심 규정을 직접 읽어 정리했고, RO-Crate, OAIS, MAME software list, No-Intro/Redump, SWHID, Data Package, Internet Archive는 인덱스·소개 수준(부분)이다([참고 자료](crate::docs::references::preservation) 1절, [스키마](crate::docs::schema) 4절). 비교와 판정은 조사가 하지 않았으므로 이 문서도 판정하지 않는다.
+- 대안 비교: 처음에는 2차 정보만 있어 제외했다. 2026-10-09에 다른 AI의 조사가 BagIt(RFC 8493)과 OCFL 1.1의 핵심 규정을 직접 읽어 정리했고, RO-Crate, OAIS, MAME software list, No-Intro/Redump, SWHID, Data Package, 인터넷 아카이브는 인덱스·소개 수준(부분)이다([참고 자료](crate::docs::references::preservation) 1절, [스키마](crate::docs::schema) 4절). 비교와 판정은 조사가 하지 않았으므로 이 문서도 판정하지 않는다.
 - BagIt은 SHA-256·SHA-512 지원을 도구의 필수로 하고 OCFL은 콘텐츠 주소에 `sha512`·`sha256`만 허용한다. 둘 다 SHA3-256이 필수·허용 집합에 없어서, 3절의 "필수 해시 집합" 논의에 SHA-512 보관 여부가 추가된다.
 
 ## 5. BMS 파서와 인코딩
