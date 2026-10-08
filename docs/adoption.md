@@ -95,8 +95,8 @@
 | 인코딩 | encoding_rs 0.8.42(Apache-2.0 OR MIT, BSD-3 고지 포함) | |
 | MIME | infer 0.22.0(MIT)을 기본, 확장자 표를 자체 보유, magic은 선택 기능 | BMS 텍스트는 내용 기반 감지가 안 된다. Windows에서 magic은 vcpkg가 필요하다 |
 | XML | quick-xml 0.42.0(MIT, MSRV 1.86). UTF-8 선언 명시 | xml-rs, serde-xml-rs, xmlwriter 회피 |
-| 정규식 | regex 1.13.1 | 단일 검색은 O(m*n), 반복자는 최악 O(m*n²) |
-| 압축 | zip 8.6.0(MSRV 1.88). 항목 이름은 `name_raw`를 직접 디코딩하고 `enclosed_name()` 사용 | 7z(sevenz-rust2)는 MSRV 1.93이라 보류 |
+| 정규식 | `regex` 1.13.1 | 단일 검색은 O(m*n), 반복자는 최악 O(m*n²) |
+| 압축 | `zip` 8.6.0(MSRV 1.88). 항목 이름은 `name_raw`를 직접 디코딩하고 `enclosed_name()` 사용 | 7z(sevenz-rust2)는 MSRV 1.93이라 보류 |
 
 툴체인 하한은 기본 1.85, zip과 libxml 1.88, iroh 1.91, sevenz-rust2 1.93이다.
 

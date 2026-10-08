@@ -27,14 +27,14 @@
 
 ### BMSE
 
-- 링크: [사이트](http://ucn.tokonats.net/software/bmse/), [github](https://github.com/Nekokan/BMSE)
+- 링크: [사이트](http://ucn.tokonats.net/software/bmse/), [GitHub](https://github.com/Nekokan/BMSE)
 - 대응하지 않는 header
   - 파일 관련: `#BANNER`, `#BACKBMP`, `#EXBMPzz`, `#VIDEOFILE`, `#CHARFILE`, `#MIDIFILE`, `#EXWAVzz`, `#PREVIEW`, `#MATERIALSWAV`, `#MATERIALSBMP`, `#PATH_WAV`, `#CDDA`
   - 메타데이터 관련: `#SUBTITLE`, `#SUBARTIST`, `#MAKER`
 
 ### iBMSC
 
-- 링크: [github](https://github.com/aqtq314/iBMSC). 2013-11-09의 3.0.5가 마지막 릴리스이고 유지보수가 중단됐다(조사 확인).
+- 링크: [GitHub](https://github.com/aqtq314/iBMSC). 2013-11-09의 3.0.5가 마지막 릴리스이고 유지보수가 중단됐다(조사 확인).
 - BGA 대신할 것이 있는 쪽을 지원하는 목적이라 `#BMP`를 뺌.
 - `source/iBMSC/iBMSC/Form1.vb`
   - `Private Sub OpenBMS(ByVal As String)`
@@ -44,7 +44,7 @@
 
 ### μBMSC
 
-- 링크: [github](https://github.com/zardoru/iBMSC). 원본 기록이 적은 주소이며, 정식 저장소 주소는 이번 조사에서 확인하지 못했다.
+- 링크: [GitHub](https://github.com/zardoru/iBMSC). 원본 기록이 적은 주소이며, 정식 저장소 주소는 이번 조사에서 확인하지 못했다.
 - iBMSC와 비슷하게 `#BMP`를 뺌.
 - `iBMSC/ChartIO.vb`
   - `Private Sub OpenBMS(ByVal As String)`
@@ -130,10 +130,10 @@
 | [encoding_rs](https://docs.rs/encoding_rs/latest/encoding_rs/struct.Encoding.html) | 확인 | `decode`의 bool은 오류를 U+FFFD로 대체했는지 여부 |
 | [WHATWG Encoding Standard](https://encoding.spec.whatwg.org/) | 부분 | Shift_JIS 라벨과 디코더. 앞 100k자만 읽음 |
 | [chardetng](https://docs.rs/chardetng/latest/chardetng/struct.EncodingDetector.html) | 확인 | `encoding_rs::Encoding`을 돌려줘 바로 연결됨 |
-| [regex](https://docs.rs/regex/latest/regex/) | 확인 | 1.13.1. 한 번 컴파일해 재사용 |
+| [`regex`](https://docs.rs/regex/latest/regex/) | 확인 | 1.13.1. 한 번 컴파일해 재사용 |
 | [sha3](https://docs.rs/sha3/latest/sha3/) | 확인 | 0.12.0이 최신. 0.11.0-pre.4는 yank되진 않았지만 구버전 |
 | [FIPS 202](https://csrc.nist.gov/pubs/fips/202/final) | 부분 | SHA-3 표준. 랜딩 페이지만 확인 |
-| [magic](https://docs.rs/magic/latest/magic/) · [README](https://github.com/robo9k/rust-magic/blob/main/README-crate.md) | 확인 | 0.16.7. Windows는 vcpkg로 libmagic이 필요 |
+| [magic](https://docs.rs/magic/latest/magic/) · [`README`](https://github.com/robo9k/rust-magic/blob/main/README-crate.md) | 확인 | 0.16.7. Windows는 vcpkg로 libmagic이 필요 |
 | [libmagic(3)](https://man7.org/linux/man-pages/man3/libmagic.3.html) · [file(1)](https://man7.org/linux/man-pages/man1/file.1.html) | 확인 | DB 경로는 `MAGIC` 환경변수 |
 | [RFC 6838](https://www.rfc-editor.org/rfc/rfc6838) · [IANA 미디어 타입](https://www.iana.org/assignments/media-types/media-types.xhtml) | 부분 | WAV 항목은 확인하지 못함 |
 | [RFC 5234 (ABNF)](https://www.rfc-editor.org/rfc/rfc5234) | 확인 | 문법 표기법. 따옴표 문자열은 기본적으로 대소문자 무시 |

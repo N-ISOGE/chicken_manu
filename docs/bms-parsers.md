@@ -1,3 +1,4 @@
+<!-- markdownlint-disable MD024 -->
 # BMS 파서 구현 정리
 
 이 문서는 BMS 형식을 실제로 파싱하는 주요 도구 및 구동기의 구현을 정리한 것입니다.
@@ -26,12 +27,12 @@
 
 | 도구 | 종류 | 언어 | 저장소 |
 |------|------|------|--------|
-| [jbms-parser] | 구동기 파서 (Beatoraja) | Java | https://github.com/exch-bms2/jbms-parser |
-| [bms-js] | 구동기 파서 (Bemuse) | TypeScript | https://github.com/bemusic/bemuse/tree/master/packages/bms |
-| [BMSE] | 편집기 | VB.NET | https://github.com/Nekokan/BMSE |
-| [iBMSC] | 편집기 | VB.NET | https://github.com/aqtq314/iBMSC |
-| [μBMSC] | 편집기 (iBMSC 포크) | VB.NET | https://github.com/zardoru/iBMSC |
-| [Qwilight] | 구동기 | — | https://taehui.ddns.net/ko (소스 비공개) |
+| [jbms-parser] | 구동기 파서 (Beatoraja) | Java | <https://github.com/exch-bms2/jbms-parser> |
+| [bms-js] | 구동기 파서 (Bemuse) | TypeScript | <https://github.com/bemusic/bemuse/tree/master/packages/bms> |
+| [BMSE] | 편집기 | VB.NET | <https://github.com/Nekokan/BMSE> |
+| [iBMSC] | 편집기 | VB.NET | <https://github.com/aqtq314/iBMSC> |
+| [μBMSC] | 편집기 (iBMSC 포크) | VB.NET | <https://github.com/zardoru/iBMSC> |
+| [Qwilight] | 구동기 | — | <https://taehui.ddns.net/ko> (소스 비공개) |
 
 [jbms-parser]: https://github.com/exch-bms2/jbms-parser
 [bms-js]: https://github.com/bemusic/bemuse/tree/master/packages/bms
@@ -47,7 +48,7 @@
 ### 2.1 jbms-parser (Beatoraja)
 
 - **파일**: `src/bms/model/BMSDecoder.java`
-- **저장소**: https://github.com/exch-bms2/jbms-parser
+- **저장소**: <https://github.com/exch-bms2/jbms-parser>
 
 #### 파싱 방식
 
@@ -87,7 +88,7 @@
 ### 2.2 bms-js (Bemuse)
 
 - **파일**: `packages/bms/src/reader/index.ts`, `packages/bms/src/compiler/index.ts`
-- **저장소**: https://github.com/bemusic/bemuse/tree/master/packages/bms
+- **저장소**: <https://github.com/bemusic/bemuse/tree/master/packages/bms>
 
 #### 파싱 방식
 
@@ -122,7 +123,7 @@
 ### 2.3 BMSE
 
 - **파일**: `modInput.vb`
-- **저장소**: https://github.com/Nekokan/BMSE
+- **저장소**: <https://github.com/Nekokan/BMSE>
 
 #### 파싱 방식
 
@@ -150,7 +151,7 @@
 ### 2.4 iBMSC
 
 - **파일**: `source/iBMSC/iBMSC/Form1.vb`
-- **저장소**: https://github.com/aqtq314/iBMSC
+- **저장소**: <https://github.com/aqtq314/iBMSC>
 
 #### 파싱 방식
 
@@ -189,7 +190,7 @@
 ### 2.5 μBMSC
 
 - **파일**: `iBMSC/ChartIO.vb`
-- **저장소**: https://github.com/zardoru/iBMSC (iBMSC 포크)
+- **저장소**: <https://github.com/zardoru/iBMSC> (iBMSC 포크)
 
 iBMSC에서 파생된 포크. 파싱 구조는 거의 동일하나 다음 차이가 있음.
 
@@ -221,7 +222,7 @@ If Channel = "SC" Then .Value = hSCROLL(C36to10(Mid(sLineTrim, xI1, 2)))
 
 ### 2.6 Qwilight
 
-- **저장소**: https://taehui.ddns.net/ko (소스 비공개)
+- **저장소**: <https://taehui.ddns.net/ko> (소스 비공개)
 
 소스 코드를 직접 확인할 수 없음.
 [hitkey BMS command memo](https://hitkey.nekokan.dyndns.info/cmds.htm) 에서 참고한

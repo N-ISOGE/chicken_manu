@@ -1,3 +1,4 @@
+<!-- markdownlint-disable MD024 -->
 # 변경 기록
 
 이 문서는 [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/) 형식과
@@ -11,7 +12,7 @@
 - 로드맵과 풀어야 할 문제들은 이 문서가 아니라 `docs/notes.md`에 있다.
   이전 `change_log.md`의 시간 기반 기록은 아래 버전별 기록으로 대체했다.
 
-`0.1.0` 이후의 버전 번호는 이 문서를 바꾸면서 git 기록을 보고 소급해 붙인 것이다. 태그는 없다.
+`0.1.0` 이후의 버전 번호는 이 문서를 바꾸면서 Git 기록을 보고 소급해 붙인 것이다. 태그는 없다.
 `Cargo.toml`의 버전은 아직 `0.1.0`이다.
 
 ## Unreleased
@@ -32,6 +33,8 @@
 ### Changed
 
 - 린트 워크플로 폴더 이름의 오타를 고쳤다(`.github/workflow` → `.github/workflows`). GitHub Actions는 `workflows`만 읽는다.
+- 린트 워크플로를 갱신했다. `actions/checkout` v4→v6(Node 20 지원 중단 경고), super-linter v6.8.0→v8.7.0, `ubuntu-latest`→`ubuntu-24.04`(2026-10-19부터 `ubuntu-latest`가 Ubuntu 26으로 바뀐다).
+- 린트가 지적한 문서의 용어 표기, 맨몸 URL을 고쳤다. 제목이 반복되는 `change_log.md`와 `docs/bms-parsers.md`는 파일 안에서만 MD024를 껐다.
 - `Cargo.toml`: Cargo가 무시하던 `[env]` 항목을 지웠다.
 - `README.md`를 정리했다. "매체"와 "에셋"을 정의하고(에셋은 매체가 참조하는 파일로 매체 바깥), 목적을 두 방향(매체의 형식 조사, 공유·보존 도구의 명세와 구현)으로 나눴다.
 - `docs/index.md`: "표현"을 "매체"로 바꾸고 용어 절을 추가했다. 열린 결정에 사용자가 밝힌 방향(매체 정의와 저작권 검토는 다른 AI에게 위임, 도서관식 목록 관리, libp2p 기반 IPFS 후보와 추가 조사, 포맷 사이의 변환은 나중에)을 적었다.
@@ -63,7 +66,7 @@
 
 ### Added
 
-- 저장소 초기 설정: README, `.gitignore`(Rust, JetBrains, VS Code), Project IDX 환경(`.idx/dev.nix`)(2024-07-11부터).
+- 저장소 초기 설정: `README`, `.gitignore`(Rust, JetBrains, Visual Studio Code), Project IDX 환경(`.idx/dev.nix`)(2024-07-11부터).
 - Cargo 패키지 `chicken_manu` 초기화(2024-08-02).
 - 저장소 설정: `CODEOWNERS`, super-linter 린트 워크플로, `CODE_OF_CONDUCT.md`.
 - BMS 파일 읽기: 문자표 기반(비 Unicode) 인코딩을 `encoding_rs`로 해석한다.
