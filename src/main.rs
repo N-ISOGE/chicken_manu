@@ -1,9 +1,6 @@
-//! # chicken_menu
-//!
-//!
-//!
-//!
-//!
+#![doc = include_str!("../docs/index.md")]
+
+pub mod docs;
 
 use std::io::Write;
 use std::path::Path;
