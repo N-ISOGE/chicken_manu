@@ -1,6 +1,6 @@
 # 상용·모바일·VR 포맷 후보
 
-다른 AI(perplexity)의 조사(2026-10-09)에서 옮겼다. 재확인이 1차 조사와 겹치면 재확인을 따랐다.
+별도 조사(2026-10-09)에서 옮겼다. 재확인이 1차 조사와 겹치면 재확인을 따랐다.
 원장 ID(`FMT-<분류>-<번호>`)는 어느 조사도 주지 않았으므로 아래 표에는 없다. ID를 붙이는 일은 원장과 대조한 뒤에 한다.
 신빙성은 조사가 매긴 값이며, 재확인은 비공식 저장소를 직접 읽었다는 이유로 A를 준 반면 1차 조사는 같은 종류를 B로 줘서 조사 사이에 기준이 일정하지 않다.
 
@@ -24,5 +24,5 @@
 | Rhythm Doctor, ADOFAI, Dynamix, Beat Banger               | JSON Schema(미확인), `.adofai`, XML(DynaMaker), `chart.cfg`                    | rd-schema, SharpFAI, dynamaker-guide, beat-banger-modding-tool                                                                                                                                    | 부분, B·C (추가 조사) | Rhythm Doctor의 `rd-schema`는 [지원 대상](crate::docs::formats) 3절과 같이 미확인                                                    |
 | Lanota, Rotaeno, Fortnite Festival, Pistol Whip, Deemo II | 형식 미확인                                                                    | Lanotalium은 "No License", 나머지는 검색 결과 수준                                                                                                                                                | 미확인·C              | Pistol Whip 공개일이 자료마다 다름(2023-05-31, 2023-06-14). 어느 날짜도 도구 갱신일로 쓰지 않음                                      |
 
-추가 조사는 Audica와 Dynamix가 "기존 프로젝트 자료(`records/2026/RG-20260923-002.md`)에 이미 게임 목록으로 등장한다"고 적었는데, 이 파일은 이 저장소에 없다.
-같은 조사가 원장 119행 수치와 위키 인덱스를 인계 정보로만 인용했다고 밝혔으므로 이 저장소에서 확인할 수 없는 값으로 둔다.
+추가 조사는 Audica와 Dynamix를 이전 자료에 이미 게임 목록으로 등장한다고 적었지만, 그 자료는 이 저장소에 없다.
+같은 조사가 원장 119행 수치와 위키 인덱스를 전해 받은 정보로만 인용했다고 밝혔으므로 이 저장소에서 확인할 수 없는 값으로 둔다.

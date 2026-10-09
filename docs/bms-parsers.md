@@ -362,7 +362,7 @@ If Channel = "SC" Then .Value = hSCROLL(C36to10(Mid(sLineTrim, xI1, 2)))
 | μBMSC       |  ○   | `hSCROLL(1295)` 배열, 채널 `SC`                              |
 
 위 표의 bms-js ×는 파서 소스를 읽은 결과다. 한편 Bemuse에는 지원 문서와 별도로 공식 "Bemuse's BMS Extensions" 페이지가 있고,
-다른 AI의 조사(2026-10-09)가 본 검색 발췌에는 `#SCROLL01`, `#SCROLL02`, `#SPEED01`이 나온다. 본문을 열지 못했고 이 확장이 bms-js 파서에 구현돼 있는지도
+별도 조사(2026-10-09)가 본 검색 발췌에는 `#SCROLL01`, `#SCROLL02`, `#SPEED01`이 나온다. 본문을 열지 못했고 이 확장이 bms-js 파서에 구현돼 있는지도
 모르므로 위 표를 바꾸지 않는다(미확인, 재조사 필요). `#SPEED01`은 이 문서에 없는 이름이다.
 
 `bms.ebnf`의 `timing_header`에서 `#SCROLLxx` 반영 여부는 별도 판단이 필요함.
