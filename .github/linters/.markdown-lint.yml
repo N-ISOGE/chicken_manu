@@ -1,0 +1,15 @@
+---
+# super-linter의 기본 markdownlint 설정(TEMPLATES/.markdown-lint.yml)에서
+# 표(MD013 tables)만 줄 길이 검사에서 뺐다. 표 행은 줄을 나눌 수 없다.
+MD004: false
+MD007:
+  indent: 2
+MD013:
+  line_length: 400
+  tables: false
+MD026:
+  punctuation: ".,;:!。，；:"
+MD029: false
+MD033: false
+MD036: false
+blank_lines: false
