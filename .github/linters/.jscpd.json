@@ -1,1 +1,5 @@
-{ "threshold": 0, "reporters": ["consoleFull"], "ignore": ["**/*.md", "LICENSES/**"] }
+{
+  "threshold": 0,
+  "reporters": ["consoleFull"],
+  "ignore": ["**/*.md", "LICENSES/**"]
+}
