@@ -54,6 +54,7 @@
 
 - md는 prettier(3.3.3)로 맞춘다: `npx prettier@3.3.3 --write <파일>`.
 - 전체를 한 번에 바꾸지 않고 **고치는 파일부터** 맞춘다. 서식 검사(`MARKDOWN_PRETTIER`)는 모든 파일이 맞춰질 때까지 워크플로에서 끈다.
+- 표를 고치면 열 너비를 다시 맞춘다(MD060). CI 린트의 확인 방법, 자주 걸리는 실패, 병합 방식은 [CI 린트](crate::docs::notes::ci_lint)에 있다.
 - 아직 맞추지 않은 파일은 `npx prettier@3.3.3 --check "**/*.md"`로 볼 수 있다.
   맞춘 파일: `docs/bms-parsers.md`, `docs/references.md`, `docs/formats.md`, `docs/schema.md`, `docs/adoption.md`, `docs/bms-grammar.md`, `docs/index.md`, `docs/notes.md`, `docs/references/`와 `docs/formats/`의 하위 문서 전체.
 

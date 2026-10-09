@@ -30,10 +30,12 @@
   - `docs/formats/`: `chart-units.md`(포맷별 채보 단위와 파일 참조 필드), `commercial.md`(상용·모바일·VR 포맷 후보), `format-checks.md`(포맷별 추가 확인 사항). `docs/formats.md`에는 로컬 샘플 193개 중 4개가 macOS 메타 파일이라 BMS는 189개임을 적었다.
   - `docs/schema.md`: 파일 하나에 채보가 여럿인 포맷, 곡 단위 메타의 위치, 묶음 종류와 외부 식별자, 다른 표준의 해시 철자와 SHA-512 쟁점, 다른 보존·교환 포맷과의 비교(4절).
   - `docs/bms-parsers.md`: 한 PC의 BMS 샘플 189개로 한 인코딩 바이트 시험 결과. beatoraja 판정은 근사이고 BOM·비ASCII UTF-8 경로는 검증하지 못했다.
+- `docs/notes/ci-lint.md`: CI 린트(super-linter)의 구성, 결과 확인 방법, 표 열 정렬(MD060)과 JSON 서식, 자주 걸리는 실패, 병합 방식과 표 정렬 스크립트를 하위 문서로 추가했다. `docs/notes.md`의 "마크다운 서식"에서 연결한다.
 
 ### Changed
 
-- 지원 대상 문서(`docs/formats.md`)에서 저장소 안에서 확인할 수 없는 표기와 집계를 빼고 공개 근거와 분류 이름만 남겼다. 보강 제안 문서는 `docs/formats/format-checks.md`(포맷별 추가 확인 사항)로 바꾸고 현재→제안 열을 뺐다. 표의 등급 표기는 확인 상태(확인·부분·미확인)만 남기고 뺐다.
+- 지원 대상 문서(`docs/formats.md`)에서 저장소 안에서 확인할 수 없는 표기와 집계를 빼고 공개 근거만 남겼다. 보강 제안 문서는 `docs/formats/format-checks.md`(포맷별 추가 확인 사항)로 바꾸고 현재→제안 열을 뺐다. 표의 등급 표기는 확인 상태(확인·부분·미확인)만 남기고 뺐다.
+- 지원 대상 문서의 2절에서 포맷 분류 이름 목록을 빼고 조사 원칙만 남겼다. 3단계 행의 "특수규칙·레벨형"은 "특수 규칙 포맷"으로 바꿨다.
 - 포맷 식별자 체계의 방향(이름 슬러그를 기본으로 하고 외부 ID는 선택 필드)을 `docs/formats.md` 1절에 적었다.
 - 린트 워크플로 폴더 이름의 오타를 고쳤다(`.github/workflow` → `.github/workflows`). GitHub Actions는 `workflows`만 읽는다.
 - 린트 워크플로를 갱신했다. `actions/checkout` v4→v6(Node 20 지원 중단 경고), super-linter v6.8.0→v8.7.0, `ubuntu-latest`→`ubuntu-24.04`(2026-10-19부터 `ubuntu-latest`가 Ubuntu 26으로 바뀐다).
