@@ -4,7 +4,7 @@
 
 근거는 세 가지다.
 
-1. `pattern.category`는 "기존에 알려진 패턴 형식들의 식별자"를 쓰도록 설계됐다. 이 값에 쓸 식별자 체계(포맷 이름, 확장자, 이 저장소가 정하는 코드 등)는 아직 정해지지 않았다.
+1. `pattern.category`는 "기존에 알려진 패턴 형식들의 식별자"를 쓰도록 설계됐다([스키마](crate::docs::schema)). 포맷별 식별자 체계(포맷 이름, 확장자, 이 저장소가 정하는 코드 등)는 아직 정하지 않았다.
 2. 각 포맷의 명세 공개 여부와 확인 수준(확인 / 부분 / 미확인).
 3. 저장소의 로컬 샘플이 BMS 계열뿐이다(.bms 71, .bme 96, .bml 15, .pms 11, 합계 193개). 이 가운데 4개는 macOS AppleDouble 메타 파일(`._append_*.bms`)이라 BMS는 189개다([BMS 문법](crate::docs::bms_grammar) 5절). `test_resource/`는 `.gitignore` 대상이라 저장소에는 없다. 다른 계열은 검증용 샘플을 아직 확보하지 못했다.
 
@@ -72,4 +72,4 @@ Rust 구현에서 pest, nom, winnow 등으로 옮기는 선택은 아직 비교�
 | ---------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
 | [포맷별 채보 단위와 파일 참조 필드](crate::docs::formats::chart_units) | osu!, bmson, StepMania, Clone Hero 등의 파일당 채보 수와 다른 파일을 가리키는 필드 |
 | [상용·모바일·VR 포맷 후보](crate::docs::formats::commercial)           | pop'n music, GITADORA, Groove Coaster, VR 리듬게임 등                              |
-| [포맷별 추가 확인 사항](crate::docs::formats::format_checks)           | 포맷 9건에서 새로 확인한 사실                                                      |
+| [포맷별 추가 확인 사항](crate::docs::formats::format_checks)           | RBN, simai, PEC, RPE, `.vox`, `.chart` 레인, UCS, maimai ma2, ADOFAI의 확인 내용                                                      |
