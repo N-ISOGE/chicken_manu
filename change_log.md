@@ -27,12 +27,13 @@
   - BMS 문법 초안(ABNF, `docs/bms.abnf`)과 실제 BMS 파일 189개로 한 검증 결과.
 - 별도 조사 결과(2026-10-09)를 문서에 반영했다. 별도 조사 결과이고 이 저장소가 다시 확인한 값은 아니다.
   - `docs/references/`: `bms.md`에서 BMS 명세 상태 갱신(BM98 원전, hitkey 원 호스트, Guide, bmson 포크와 독립 JSON Schema, Bemuse 확장 문서), `charts.md`에 엔진·파서·변환기 9종과 채보 에디터·저작 도구, `preservation.md`에 보존·교환 포맷 선행사례와 재배포 조건의 원문 위치.
-  - `docs/formats/`: `chart-units.md`(포맷별 채보 단위와 파일 참조 필드), `commercial.md`(상용·모바일·VR 포맷 후보), `ledger-proposals.md`(원장 보강 제안). `docs/formats.md`에는 로컬 샘플 193개 중 4개가 macOS 메타 파일이라 BMS는 189개임을 적었다.
+  - `docs/formats/`: `chart-units.md`(포맷별 채보 단위와 파일 참조 필드), `commercial.md`(상용·모바일·VR 포맷 후보), `format-checks.md`(포맷별 추가 확인 사항). `docs/formats.md`에는 로컬 샘플 193개 중 4개가 macOS 메타 파일이라 BMS는 189개임을 적었다.
   - `docs/schema.md`: 파일 하나에 채보가 여럿인 포맷, 곡 단위 메타의 위치, 묶음 종류와 외부 식별자, 다른 표준의 해시 철자와 SHA-512 쟁점, 다른 보존·교환 포맷과의 비교(4절).
   - `docs/bms-parsers.md`: 한 PC의 BMS 샘플 189개로 한 인코딩 바이트 시험 결과. beatoraja 판정은 근사이고 BOM·비ASCII UTF-8 경로는 검증하지 못했다.
 
 ### Changed
 
+- 지원 대상 문서(`docs/formats.md`)에서 포맷 ID 열, 등록 상태·신빙성 집계, 포맷 분류별 행 수를 빼고 공개 근거만 남겼다. 분류 이름과 조사 원칙은 2절에 적었다. `docs/formats/ledger-proposals.md`는 `format-checks.md`로 바꾸고 현재→제안 열을 뺐다.
 - 린트 워크플로 폴더 이름의 오타를 고쳤다(`.github/workflow` → `.github/workflows`). GitHub Actions는 `workflows`만 읽는다.
 - 린트 워크플로를 갱신했다. `actions/checkout` v4→v6(Node 20 지원 중단 경고), super-linter v6.8.0→v8.7.0, `ubuntu-latest`→`ubuntu-24.04`(2026-10-19부터 `ubuntu-latest`가 Ubuntu 26으로 바뀐다).
 - 워크플로의 액션을 커밋 SHA로 고정하고 `persist-credentials: false`를 설정했다(zizmor 지적). codespell 설정(`.github/linters/.codespellrc`)을 추가했다.
@@ -55,7 +56,7 @@
   로드맵과 문제들은 `docs/notes.md`로, 참고 자료는 `docs/references.md`로, BMS 문법 초안은 `docs/bms-grammar.md`로 옮겼다.
 - `src/main.rs`: 크레이트 문서를 `docs/index.md`에서 가져오고 `docs` 모듈을 선언했다.
 - `docs/adoption.md`, `docs/bms-grammar.md`, `docs/index.md`: 위 조사 결과에 맞춰 "조사하지 못했다"고 적었던 곳(대안 비교, 저작권·재배포, CP932 바이트 시험)의 문구를 고쳤다. `docs/index.md`의 구현 위치(`util-for-parsing` → `src/main.rs`)도 고쳤다.
-- 분량이 늘어난 `docs/references.md`(61KB)와 `docs/formats.md`(35KB)를 주제별 하위 문서로 나눴다(`docs/references/`: bms, standards, charts, preservation. `docs/formats/`: chart-units, commercial, ledger-proposals). 상위 문서는 목차로 남기고 `src/docs.rs`에서 하위 모듈로 싣는다. 다른 문서의 절 번호 참조와 `docs/index.md` 목차를 고쳤다. 문서를 나누는 기준을 `docs/notes.md`에 적었다. 이 기준은 임시다.
+- 분량이 늘어난 `docs/references.md`(61KB)와 `docs/formats.md`(35KB)를 주제별 하위 문서로 나눴다(`docs/references/`: bms, standards, charts, preservation. `docs/formats/`: chart-units, commercial, format-checks). 상위 문서는 목차로 남기고 `src/docs.rs`에서 하위 모듈로 싣는다. 다른 문서의 절 번호 참조와 `docs/index.md` 목차를 고쳤다. 문서를 나누는 기준을 `docs/notes.md`에 적었다. 이 기준은 임시다.
 - 마크다운 서식(prettier)을 맞춘 문서를 `references`, `formats`, `schema`, `adoption`, `bms-grammar`, `index`, `notes`로 늘렸다.
 
 ## 0.1.2 - 2024-08-09

@@ -22,4 +22,4 @@
 - `.sm`, `.ssc`, `.chart`는 파일 하나에 채보가 여럿이다. "채보 파일 하나 = 패턴 하나"라는 [스키마](crate::docs::schema)의 가정이 이 포맷들에서는 성립하지 않는다.
 - 곡 단위 메타가 채보 파일 밖에 있는 포맷(Clone Hero `song.ini`, Beat Saber `Info.dat`)과 채보마다 중복 기재하는 포맷(osu!, StepMania)이 있다.
 - 참조 필드의 모양이 BMS의 (헤더, 인덱스, 원문 경로)와 다르다. 키·태그형(osu!, StepMania, KSH), 배열 원소형(bmson), 이름 관행형(Clone Hero)이 있다.
-- [지원 대상](crate::docs::formats)의 단계 표(1절)는 DTX, Quaver `.qua`, `.sng`를 "A·추출"이나 "B·추출"로 적었는데, 이 조사는 세 포맷 모두 필드를 확인하지 못했다. 원장이 다른 경로로 얻은 값일 수 있고 어느 쪽이 맞는지 모른다.
+- [지원 대상](crate::docs::formats)의 단계 표(1절)는 DTX, Quaver `.qua`, `.sng`를 지원 후보로 적었는데, 이 조사는 세 포맷 모두 필드를 확인하지 못했다. 다른 경로로 얻은 값일 수 있고 어느 쪽이 맞는지 모른다.
