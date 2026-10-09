@@ -33,7 +33,8 @@
 
 ### Changed
 
-- 지원 대상 문서(`docs/formats.md`)에서 포맷 ID 열, 등록 상태·신빙성 집계, 포맷 분류별 행 수를 빼고 공개 근거만 남겼다. 분류 이름과 조사 원칙은 2절에 적었다. `docs/formats/ledger-proposals.md`는 `format-checks.md`로 바꾸고 현재→제안 열을 뺐다.
+- 지원 대상 문서(`docs/formats.md`)에서 저장소 안에서 확인할 수 없는 표기와 집계를 빼고 공개 근거와 분류 이름만 남겼다. 보강 제안 문서는 `docs/formats/format-checks.md`(포맷별 추가 확인 사항)로 바꾸고 현재→제안 열을 뺐다. 표의 등급 표기는 확인 상태(확인·부분·미확인)만 남기고 뺐다.
+- 포맷 식별자 체계의 방향(이름 슬러그를 기본으로 하고 외부 ID는 선택 필드)을 `docs/formats.md` 1절에 적었다.
 - 린트 워크플로 폴더 이름의 오타를 고쳤다(`.github/workflow` → `.github/workflows`). GitHub Actions는 `workflows`만 읽는다.
 - 린트 워크플로를 갱신했다. `actions/checkout` v4→v6(Node 20 지원 중단 경고), super-linter v6.8.0→v8.7.0, `ubuntu-latest`→`ubuntu-24.04`(2026-10-19부터 `ubuntu-latest`가 Ubuntu 26으로 바뀐다).
 - 워크플로의 액션을 커밋 SHA로 고정하고 `persist-credentials: false`를 설정했다(zizmor 지적). codespell 설정(`.github/linters/.codespellrc`)을 추가했다.
