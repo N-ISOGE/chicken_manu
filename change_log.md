@@ -25,7 +25,7 @@
 - `docs/`에 조사 문서를 추가하고 `cargo doc`으로 볼 수 있게 `src/docs.rs`에서 싣는다.
   - 기록·로드맵(`notes`), 참고 자료, 기술 채택 판단, 스키마와 식별자, 지원 대상과 명세의 형식화.
   - BMS 문법 초안(ABNF, `docs/bms.abnf`)과 실제 BMS 파일 189개로 한 검증 결과.
-- 다른 AI의 조사 결과(2026-10-09)를 문서에 반영했다. 다른 AI의 조사 결과이고 이 저장소가 다시 확인한 값은 아니다.
+- 별도 조사 결과(2026-10-09)를 문서에 반영했다. 별도 조사 결과이고 이 저장소가 다시 확인한 값은 아니다.
   - `docs/references/`: `bms.md`에서 BMS 명세 상태 갱신(BM98 원전, hitkey 원 호스트, Guide, bmson 포크와 독립 JSON Schema, Bemuse 확장 문서), `charts.md`에 엔진·파서·변환기 9종과 채보 에디터·저작 도구, `preservation.md`에 보존·교환 포맷 선행사례와 재배포 조건의 원문 위치.
   - `docs/formats/`: `chart-units.md`(포맷별 채보 단위와 파일 참조 필드), `commercial.md`(상용·모바일·VR 포맷 후보), `ledger-proposals.md`(원장 보강 제안). `docs/formats.md`에는 로컬 샘플 193개 중 4개가 macOS 메타 파일이라 BMS는 189개임을 적었다.
   - `docs/schema.md`: 파일 하나에 채보가 여럿인 포맷, 곡 단위 메타의 위치, 묶음 종류와 외부 식별자, 다른 표준의 해시 철자와 SHA-512 쟁점, 다른 보존·교환 포맷과의 비교(4절).
