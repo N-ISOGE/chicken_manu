@@ -66,13 +66,13 @@
 
 ## 5. 인프라와 라이선스
 
-| 자료                                                                                                                                                | 상태   | 메모                                               |
-| --------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | -------------------------------------------------- |
-| [super-linter v6.8.0](https://github.com/super-linter/super-linter/tree/v6.8.0)                                                                     | 확인   | 저장소 린트 워크플로가 고정한 버전                 |
-| [GitHub Actions 워크플로 문법](https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions)                             | 확인   | 워크플로 파일은 `.github/workflows/`에 있어야 한다 |
-| [CODEOWNERS](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners) | 확인   |                                                    |
-| [Contributor Covenant 2.0](https://www.contributor-covenant.org/version/2/0/code_of_conduct/)                                                       | 확인   |                                                    |
-| [CC BY-SA 4.0 법률 조항](https://creativecommons.org/licenses/by-sa/4.0/legalcode)                                                                  | 확인   | README가 문서 기본 라이선스로 지정                 |
-| [GNU GPL v3.0](https://www.gnu.org/licenses/gpl-3.0.html)                                                                                           | 미확인 | 서버가 429를 반환해 열지 못함                      |
-| [Firebase Studio 전환 공지](https://firebase.google.com/docs/studio/idx-is-firebase-studio)                                                         | 확인   | `.idx/dev.nix`가 속한 IDX가 2027-03-22에 종료 예정 |
-| [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) · [SemVer](https://semver.org/)                                                            | 확인   | 기록 문서 형식 참고                                |
+| 자료                                                                                                                                                | 상태   | 메모                                                |
+| --------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | --------------------------------------------------- |
+| [super-linter v8.7.0](https://github.com/super-linter/super-linter/tree/v8.7.0)                                                                     | 확인   | 저장소 린트 워크플로가 고정한 버전(커밋 SHA로 고정) |
+| [GitHub Actions 워크플로 문법](https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions)                             | 확인   | 워크플로 파일은 `.github/workflows/`에 있어야 한다  |
+| [CODEOWNERS](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners) | 확인   |                                                     |
+| [Contributor Covenant 2.0](https://www.contributor-covenant.org/version/2/0/code_of_conduct/)                                                       | 확인   |                                                     |
+| [CC BY-SA 4.0 법률 조항](https://creativecommons.org/licenses/by-sa/4.0/legalcode)                                                                  | 확인   | README가 문서 기본 라이선스로 지정                  |
+| [GNU GPL v3.0](https://www.gnu.org/licenses/gpl-3.0.html)                                                                                           | 미확인 | 서버가 429를 반환해 열지 못함                       |
+| [Firebase Studio 전환 공지](https://firebase.google.com/docs/studio/idx-is-firebase-studio)                                                         | 확인   | `.idx/dev.nix`가 속한 IDX가 2027-03-22에 종료 예정  |
+| [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) · [SemVer](https://semver.org/)                                                            | 확인   | 기록 문서 형식 참고                                 |
