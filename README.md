@@ -57,6 +57,7 @@ Chicken Menu, 치킨메뉴, ... : 리듬게임·음악게임의 매체를 조사
 - 작성물에 따라 각각의 라이센스를 적절히 적용함
   - 명시적으로 정의하지 않은 것들에 대해선 기본적으로 [CC BY-SA 4.0]를 적용함.
   - 프로그램 코드일 경우 명시하지 않으면 [GNU GPL v3.0]를 적용함.
+  - 같은 기준을 [`LICENSE`](LICENSE) 파일에도 적었고 전문은 `LICENSES/` 폴더에 있음. 두 곳이 다르면 `LICENSE` 파일을 우선함.
 
 [GNU GPL v3.0]: https://www.gnu.org/licenses/gpl-3.0.html
 [CC BY-SA 4.0]: https://creativecommons.org/licenses/by-sa/4.0/

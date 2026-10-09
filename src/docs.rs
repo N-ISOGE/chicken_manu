@@ -42,8 +42,8 @@ pub mod formats {
     #[doc = include_str!("../docs/formats/commercial.md")]
     pub mod commercial {}
 
-    #[doc = include_str!("../docs/formats/ledger-proposals.md")]
-    pub mod ledger_proposals {}
+    #[doc = include_str!("../docs/formats/format-checks.md")]
+    pub mod format_checks {}
 }
 
 #[doc = include_str!("../docs/bms-grammar.md")]
