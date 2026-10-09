@@ -4,7 +4,7 @@
 
 | 자료                       | 새로 확인한 것                                                                                            | 확인·신빙성                                                              |
 | -------------------------- | --------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
-| RBN / C3 Documentation     | HTTPS 자체서명 인증서 문제로 열리지 않을 수 있다. 일반 HTTP로는 위키 전문이 열림                               | 확인, A                                                                  |
+| RBN / C3 Documentation     | HTTPS 자체서명 인증서 문제로 열리지 않을 수 있다. 일반 HTTP로는 위키 전문이 열림                          | 확인, A                                                                  |
 | simai(`maidata.txt`)       | atwiki `pages/25.html`은 메타데이터 헤더 규격이고 기보 문법은 `pages/1002.html`(2026-07-10 갱신판)에 있음 | 확인, B                                                                  |
 | PEC(PhiEditor)             | 줄 단위 명령(`cp`, `cd`, `ca`, `cm`, `cr`, `cf` 등). Re:PhiEdit의 PEConverter로 상호 변환                 | 확인, B                                                                  |
 | RPE(Re:PhiEdit) JSON       | `META` + `judgeLineList`. 시간 단위 `[beat, numerator, denominator]`                                      | 확인, B                                                                  |

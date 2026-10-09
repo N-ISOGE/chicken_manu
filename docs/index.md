@@ -99,7 +99,7 @@
 
 | 문서                                              | 내용                                                                                                                                                                                                                                                                                       |
 | ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| [지원 대상과 명세의 형식화](crate::docs::formats) | 최소 지원 포맷 후보, 형식화된 명세 자료. 하위 문서: [채보 단위와 참조 필드](crate::docs::formats::chart_units), [상용·모바일·VR 포맷 후보](crate::docs::formats::commercial), [포맷별 추가 확인 사항](crate::docs::formats::format_checks)                                                     |
+| [지원 대상과 명세의 형식화](crate::docs::formats) | 최소 지원 포맷 후보, 형식화된 명세 자료. 하위 문서: [채보 단위와 참조 필드](crate::docs::formats::chart_units), [상용·모바일·VR 포맷 후보](crate::docs::formats::commercial), [포맷별 추가 확인 사항](crate::docs::formats::format_checks)                                                 |
 | [참고 자료](crate::docs::references)              | 명세·도구·표준·라이브러리 링크와 확인 상태. 하위 문서: [BMS 명세와 도구](crate::docs::references::bms), [표준과 기술](crate::docs::references::standards), [채보 포맷·엔진·에디터](crate::docs::references::charts), [보존·교환 포맷과 재배포 조건](crate::docs::references::preservation) |
 
 ### 2축: 공유·보존 도구의 명세와 구현
