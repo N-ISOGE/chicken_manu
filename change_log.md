@@ -30,6 +30,7 @@
   - `docs/formats/`: `chart-units.md`(포맷별 채보 단위와 파일 참조 필드), `commercial.md`(상용·모바일·VR 포맷 후보), `format-checks.md`(포맷별 추가 확인 사항). `docs/formats.md`에는 로컬 샘플 193개 중 4개가 macOS 메타 파일이라 BMS는 189개임을 적었다.
   - `docs/schema.md`: 파일 하나에 채보가 여럿인 포맷, 곡 단위 메타의 위치, 묶음 종류와 외부 식별자, 다른 표준의 해시 철자와 SHA-512 쟁점, 다른 보존·교환 포맷과의 비교(4절).
   - `docs/bms-parsers.md`: 한 PC의 BMS 샘플 189개로 한 인코딩 바이트 시험 결과. beatoraja 판정은 근사이고 BOM·비ASCII UTF-8 경로는 검증하지 못했다.
+- `docs/notes/ci-lint.md`: CI 린트(super-linter)의 구성, 결과 확인 방법, 표 열 정렬(MD060)과 JSON 서식, 자주 걸리는 실패, 병합 방식과 표 정렬 스크립트를 하위 문서로 추가했다. `docs/notes.md`의 "마크다운 서식"에서 연결한다.
 
 ### Changed
 
