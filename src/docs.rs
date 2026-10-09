@@ -11,7 +11,10 @@
 pub mod changelog {}
 
 #[doc = include_str!("../docs/notes.md")]
-pub mod notes {}
+pub mod notes {
+    #[doc = include_str!("../docs/notes/ci-lint.md")]
+    pub mod ci_lint {}
+}
 
 #[doc = include_str!("../docs/references.md")]
 pub mod references {
