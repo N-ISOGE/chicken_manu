@@ -17,6 +17,29 @@
 | Quaver `.qua` / `.qp`            | 한 맵셋에 복수 난이도 가능(상한 미확인)                          | 미확인                                                                                                                                                                                 | 미확인                                               | `.qp`는 부분, `.qua` 필드는 미확인. API에 `package_md5`                                                                                                                 |
 | YARG `.sng`, DTX                 | 미확인                                                           | 미확인                                                                                                                                                                                 | 미확인                                               | 미확인. DTX 명세 주소 열기 실패                                                                                                                                         |
 
+## 특정 판본의 소스 열람 (2026-10-14)
+
+아래는 이 저장소에서 특정 판본의 공개 소스와 문서를 직접 열어 해당 줄을 대조한 내용이다. 확인한 것은 소스와 문서의 텍스트이고, 로더나 게임을 실행해서 얻은 값은 없다. 위 표의 다른 칸과 상태는 바뀌지 않는다.
+
+StepMania (`stepmania/stepmania` 저장소, 커밋 `825467bc`, 2026-08-22 커밋):
+
+- 곡 폴더를 읽는 `NotesLoader::LoadFromDir`(`src/NotesLoader.cpp`)는 `.ssc`, `.sma`, `.sm` 순으로 적용할 파일이 있는지 보고, 앞선 형식에 파일이 있으면 그 로더만 쓴다. 셋 모두 없을 때만 DWI, BMS, KSF를 같은 방식으로 시도한다.
+- `.sm` 로더(`src/NotesLoaderSM.cpp`)는 `#NOTES`와 `#NOTES2` 태그마다 채보를 읽는다. 곡 태그 처리기에 `BPMS`와 `STOPS`가 있고 `FREEZES`는 `STOPS`와 같은 처리기를 쓴다.
+- `.ssc` 로더(`src/NotesLoaderSSC.cpp`)는 `#NOTEDATA` 태그를 만나면 새 채보를 만들고, 이어지는 채보 태그와 `#NOTES`를 읽은 뒤 곡에 추가한다. 곡 수준의 `BPMS`, `STOPS`, `WARPS` 처리기와 채보별 처리기가 따로 있고, 채보별 타이밍은 파일 버전이 분리 타이밍 버전 이상일 때(또는 편집 파일일 때) 적용된다.
+- 이미 있는 채보를 파일에서 다시 찾는 `SSCLoader::LoadNoteDataFromSimfile`은 채보 종류, 이름, 설명, 난이도, 레벨, 크레딧을 차례로 비교하고 하나라도 다르면 그 채보를 건너뛴다. 파일 버전이 채보 이름 태그 버전 이상이면 `CHARTNAME`을 채보 이름과, `DESCRIPTION`을 설명과 비교한다. 그보다 낮은 버전이면 `DESCRIPTION` 값을 채보 이름과 비교한다.
+
+YARG (`YARC-Official/YARG.Core` 저장소, 커밋 `d42b96db`, 2026-10-11 커밋):
+
+- `.chart` 리더(`MoonscraperChartParser/IO/Chart/ChartReader.cs`)는 첫째 섹션으로 `[Song]`, 둘째 섹션으로 `[SyncTrack]`을 요구하고, 없거나 순서가 다르면 예외를 던진 뒤 나머지 악기 섹션을 읽는다. `Resolution`이 없으면 192로 보며, 설정이 없을 때 HOPO 임계는 `Resolution * 65 / 192`다(해상도 192에서 65 tick). 이 값은 파일에 적힌 값이 아니라 구현의 기본값이다.
+- `.mid` 리더(`MoonscraperChartParser/IO/Midi/MidReader.cs`)는 time division이 4분음표당 tick 방식이 아니면 예외를 던지고, 첫 트랙을 싱크 트랙으로 요구한다. 곡 전체 이벤트를 담은 EVENTS 트랙을 다른 트랙보다 먼저 찾아 읽는다. 설정이 없을 때 HOPO 임계는 `Resolution / 3 + 1`이다.
+
+osu! (`ppy/osu-wiki` 저장소, 커밋 `85834aa`, 2026-10-13 커밋, osu! 파일 형식 문서):
+
+- `Mode` 값 `3`이 osu!mania다. mania의 홀드 노트는 `x,y,time,type,hitSound,endTime:hitSample` 형태이고 `type`의 비트 7로 표시한다.
+- 열 번호는 `floor(x * columnCount / 512)`로 계산하고 `0`과 `columnCount - 1` 사이로 제한한다. mania의 오브젝트는 `y`를 쓰지 않는다.
+
+확인하지 못했거나 이 열람으로 말할 수 없는 것: StepMania 공식 위키의 서술, YARG 구현이 Clone Hero 같은 다른 게임의 동작과 같은지, 배포된 실행 파일이 위 커밋의 소스와 일치하는지, 같은 파일을 위 구현들이 실제로 어떻게 해석하는지.
+
 관찰:
 
 - `.sm`, `.ssc`, `.chart`는 파일 하나에 채보가 여럿이다. "채보 파일 하나 = 패턴 하나"라는 [스키마](crate::docs::schema)의 가정이 이 포맷들에서는 성립하지 않는다.
