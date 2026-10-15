@@ -52,3 +52,6 @@ pub mod formats {
 #[doc = include_str!("../docs/bms-grammar.md")]
 #[doc = concat!("```abnf\n", include_str!("../docs/bms.abnf"), "\n```")]
 pub mod bms_grammar {}
+
+#[doc = include_str!("../docs/bms-parsers.md")]
+pub mod bms_parsers {}
