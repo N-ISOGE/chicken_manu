@@ -1,4 +1,24 @@
-#![doc = include_str!("../docs/index.md")]
+// GitHub에서는 Markdown의 상대 경로를, rustdoc에서는 아래 모듈 링크를 사용한다.
+// 먼저 정의한 참조 링크가 우선하므로 길라잡이 본문은 한 파일로 유지한다.
+#![doc = concat!(
+    "[doc-1]: crate::docs::formats\n",
+    "[doc-2]: crate::docs::formats::chart_units\n",
+    "[doc-3]: crate::docs::schema\n",
+    "[doc-4]: crate::docs::bms_grammar\n",
+    "[doc-5]: crate::docs::bms_parsers\n",
+    "[doc-6]: crate::docs::adoption\n",
+    "[doc-7]: crate::docs::references\n",
+    "[doc-8]: crate::docs::notes\n",
+    "[doc-9]: crate::docs::formats::commercial\n",
+    "[doc-10]: crate::docs::formats::format_checks\n",
+    "[doc-11]: crate::docs::references::bms\n",
+    "[doc-12]: crate::docs::references::standards\n",
+    "[doc-13]: crate::docs::references::charts\n",
+    "[doc-14]: crate::docs::references::preservation\n",
+    "[doc-15]: crate::docs::notes::ci_lint\n",
+    "[doc-16]: crate::docs::changelog\n\n",
+    include_str!("../docs/index.md")
+)]
 
 pub mod docs;
 
