@@ -26,6 +26,7 @@
 )]
 
 pub mod docs;
+mod inventory;
 
 use std::io::{Read, Write};
 use std::path::Path;
@@ -298,58 +299,42 @@ pub fn print_file_row(file_path: &str) -> Result<String, BMSReadError> {
     ))
 }
 
-fn main() {
-    let args: Vec<String> = std::env::args().collect();
-    println!("{:?}", args);
-
-    let Some(input) = args.get(1) else {
-        eprintln!("usage: chicken_manu <directory>");
-        return;
-    };
-    let current_path = Path::new(input.as_str());
-    let Some(dir_name) = current_path.file_name().and_then(|n| n.to_str()) else {
-        eprintln!("invalid directory: {input}");
-        return;
-    };
-    let output_dir = Path::new(DEFAULT_OUTPUT_DIR);
-    if let Err(msg) = fs::create_dir_all(output_dir) {
-        println!("{:?}", msg);
-        return;
+fn run() -> Result<(), String> {
+    let mut args = std::env::args_os().skip(1);
+    let input = args
+        .next()
+        .ok_or_else(|| String::from("usage: chicken_manu <directory>"))?;
+    if args.next().is_some() {
+        return Err(String::from("usage: chicken_manu <directory>"));
     }
-    let output_file_path = output_dir.join(format!("{dir_name}.readed"));
-    let mut out_put = match fs::File::create(&output_file_path) {
-        Ok(file) => file,
-        Err(msg) => {
-            println!("{:?}", msg);
-            return;
-        }
-    };
-    let entries = match current_path.read_dir() {
-        Ok(entries) => entries,
-        Err(msg) => {
-            println!("{:?}", msg);
-            return;
-        }
-    };
-    for entry in entries {
-        let entry = match entry {
-            Ok(entry) => entry,
-            Err(msg) => {
-                println!("{:?}", msg);
-                continue;
-            }
-        };
-        let file_row = match print_file_row(&entry.path().to_string_lossy()) {
-            Ok(row) => row,
-            Err(err) => {
-                println!("{:?}", err);
-                continue;
-            }
-        };
+    let current_path = Path::new(&input);
+    let dir_name = current_path
+        .file_name()
+        .ok_or_else(|| format!("invalid directory: {}", current_path.display()))?;
+    let mut output_name = dir_name.to_os_string();
+    output_name.push(".readed");
+    let output_file_path = Path::new(DEFAULT_OUTPUT_DIR).join(output_name);
+    inventory::write_inventory(current_path, &output_file_path, |path| {
+        let filename = path
+            .to_str()
+            .ok_or_else(|| format!("path is not UTF-8: {}", path.display()))?;
+        print_file_row(filename).map_err(|error| error.to_string())
+    })
+    .map_err(|error| {
+        format!(
+            "{} -> {}: {error}",
+            current_path.display(),
+            output_file_path.display()
+        )
+    })
+}
 
-        if let Err(msg) = writeln!(out_put, "{file_row}") {
-            println!("{:?}", msg);
-            return;
+fn main() -> std::process::ExitCode {
+    match run() {
+        Ok(()) => std::process::ExitCode::SUCCESS,
+        Err(error) => {
+            eprintln!("{error}");
+            std::process::ExitCode::FAILURE
         }
     }
 }

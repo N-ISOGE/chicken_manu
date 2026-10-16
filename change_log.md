@@ -66,6 +66,10 @@
 - 분량이 늘어난 `docs/references.md`(61KB)와 `docs/formats.md`(35KB)를 주제별 하위 문서로 나눴다(`docs/references/`: bms, standards, charts, preservation. `docs/formats/`: chart-units, commercial, format-checks). 상위 문서는 목차로 남기고 `src/docs.rs`에서 하위 모듈로 싣는다. 다른 문서의 절 번호 참조와 `docs/index.md` 목차를 고쳤다. 문서를 나누는 기준을 `docs/notes.md`에 적었다. 이 기준은 임시다.
 - 마크다운 서식(prettier)을 맞춘 문서를 `references`, `formats`, `schema`, `adoption`, `bms-grammar`, `index`, `notes`로 늘렸다.
 
+### Fixed
+
+- 파일 목록 출력은 입력 디렉터리를 먼저 확인하고, 기존 결과 파일을 덮어쓰지 않는다. 파일 정보 생성이나 저장에 실패하면 이번 실행의 불완전한 결과를 지우고 실패 종료 상태를 반환한다. 하위 디렉터리는 건너뛰며, 파일명 순서로 결과를 쓴다.
+
 ## 0.1.2 - 2024-08-09
 
 ### Added
