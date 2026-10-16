@@ -1,5 +1,7 @@
 # 상용·모바일·VR 포맷 후보
 
+[← 길라잡이][project-guide]
+
 별도 조사(2026-10-09)에서 옮겼다. 재확인이 1차 조사와 겹치면 재확인을 따랐다.
 
 | 대상                                                      | 형식·확장자                                                                    | 자료와 구현체                                                                                                                                                                                     | 확인 상태          | 비고                                                                                                                                 |
@@ -19,10 +21,11 @@
 | NecroDancer                                               | 비트맵 `.txt`(사용자 설명)                                                     | [necrodancer-custom-music](https://github.com/Supinic/necrodancer-custom-music)(MIT 표시)                                                                                                         | 부분 (추가 조사)   | 세이브 파일 백업 안내                                                                                                                |
 | Spin Rhythm XD                                            | `.srtb`                                                                        | [SRTBEditor](https://github.com/plushproto/SRTBEditor) 등                                                                                                                                         | 부분 (추가 조사)   | 라이선스 전부 미확인                                                                                                                 |
 | VOEZ                                                      | JSON(2차 설명)                                                                 | [VoezEditor](https://github.com/AndrewFM/VoezEditor)                                                                                                                                              | 부분 (추가 조사)   | README를 못 읽음                                                                                                                     |
-| Rhythm Doctor, ADOFAI, Dynamix, Beat Banger               | JSON Schema(미확인), `.adofai`, XML(DynaMaker), `chart.cfg`                    | rd-schema, SharpFAI, dynamaker-guide, beat-banger-modding-tool                                                                                                                                    | 부분 (추가 조사)   | Rhythm Doctor의 `rd-schema`는 [지원 대상][nav-1] 3절과 같이 미확인                                                                   |
+| Rhythm Doctor, ADOFAI, Dynamix, Beat Banger               | JSON Schema(미확인), `.adofai`, XML(DynaMaker), `chart.cfg`                    | rd-schema, SharpFAI, dynamaker-guide, beat-banger-modding-tool                                                                                                                                    | 부분 (추가 조사)   | Rhythm Doctor의 `rd-schema`는 [조사 대상 파악][nav-1] 3절과 같이 미확인                                                              |
 | Lanota, Rotaeno, Fortnite Festival, Pistol Whip, Deemo II | 형식 미확인                                                                    | Lanotalium은 "No License", 나머지는 검색 결과 수준                                                                                                                                                | 미확인             | Pistol Whip 공개일이 자료마다 다름(2023-05-31, 2023-06-14). 어느 날짜도 도구 갱신일로 쓰지 않음                                      |
 
 추가 조사는 Audica와 Dynamix를 이전 자료에 이미 게임 목록으로 등장한다고 적었지만, 그 자료는 이 저장소에 없다.
 같은 조사가 위키 인덱스를 전해 받은 정보로만 인용했다고 밝혔으므로 이 저장소에서 확인할 수 없는 값으로 둔다.
 
 [nav-1]: ../formats.md
+[project-guide]: ../../index.md

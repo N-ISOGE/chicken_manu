@@ -1,4 +1,6 @@
-# 지원 대상과 명세의 형식화
+# 조사 대상 파악
+
+[← 길라잡이][project-guide]
 
 ## 1. 최소 지원 대상 후보
 
@@ -67,3 +69,4 @@ Rust 구현에서 pest, nom, winnow 등으로 옮기는 선택은 아직 비교�
 [nav-6]: formats/chart-units.md
 [nav-7]: formats/commercial.md
 [nav-8]: formats/format-checks.md
+[project-guide]: ../index.md

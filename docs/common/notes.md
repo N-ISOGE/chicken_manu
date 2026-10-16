@@ -1,5 +1,7 @@
 # 프로젝트 노트
 
+[← 길라잡이][project-guide]
+
 이전 `change_log.md`에 있던 로드맵과 "문제들"을 옮긴 것이다.
 버전별 변동사항은 저장소 루트의 `change_log.md`(rustdoc의 [변경 기록][nav-1])에 있다.
 참고 자료는 [참고 자료][nav-2], BMS 문법 초안은 [BMS 문법][nav-3]으로 옮겼다.
@@ -80,3 +82,4 @@ _(정리 시 추가)_ 위 질문들과 조사 결과의 대응.
 [nav-3]: ../survey/bms-grammar.md
 [nav-4]: notes/ci-lint.md
 [nav-5]: ../cataloging/schema.md
+[project-guide]: ../index.md

@@ -1,7 +1,9 @@
 # BMS 문법
 
+[← 길라잡이][project-guide]
+
 BMS 계열 파일(`.bms .bme .bml .pms`)의 문법 초안이다.
-리듬게임 채보 전반이 대상이지만([지원 대상과 명세의 형식화][nav-1]), 이 문법은 BMS 계열 **한정**이다.
+리듬게임 채보 전반이 대상이지만([조사 대상 파악][nav-1]), 이 문법은 BMS 계열 **한정**이다.
 다른 계열의 문법은 각 포맷의 명세를 조사한 뒤 별도로 쓴다.
 BMS에는 공식 형식 문법이 없어서 hitkey BMS command memo와 구동기·파서의 동작, 실제 파일을 근거로 썼다.
 전문은 이 문서 끝에 있고 원본은 `docs/survey/bms.abnf`다.
@@ -115,3 +117,4 @@ header ::= "#" ( "TITLE" | ... )
 [nav-1]: formats.md
 [nav-2]: ../cataloging/schema.md
 [nav-3]: ../common/references/bms.md
+[project-guide]: ../index.md

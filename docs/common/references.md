@@ -1,5 +1,7 @@
 # 참고 자료
 
+[← 길라잡이][project-guide]
+
 이전 `change_log.md`의 "참고할 것들"과 BMS 관련 도구 메모에, 2026-10-08 조사에서 확인한 자료와 2026-10-09 별도 조사 결과를 합쳤다.
 확인 상태는 [공통 안내의 문서 읽는 법][nav-1]의 표기를 따른다(확인 / 부분 / 미확인).
 조사 중 정정된 사실은 [기술 채택 판단][nav-2]에 있다.
@@ -19,3 +21,4 @@
 [nav-4]: references/standards.md
 [nav-5]: references/charts.md
 [nav-6]: references/preservation.md
+[project-guide]: ../index.md

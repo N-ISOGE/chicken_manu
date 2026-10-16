@@ -1,5 +1,7 @@
 # 기술 채택 판단
 
+[← 길라잡이][project-guide]
+
 2026-10-08 기준 사전 조사 결과다. 2026-10-09 별도 조사에서 알게 된 것은 4절, 5절, 10절에 따로 표시했다. 구현 계획이 아니며, 채택 전에 버전과 라이선스를 다시 확인해야 한다.
 근거 링크는 [참고 자료][nav-1]에 있다.
 
@@ -136,3 +138,4 @@
 [nav-2]: ../common/references/preservation.md
 [nav-3]: ../common/references/preservation.md
 [nav-4]: ../cataloging/schema.md
+[project-guide]: ../index.md

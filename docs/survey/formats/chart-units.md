@@ -1,5 +1,7 @@
 # 포맷별 채보 단위와 파일 참조 필드
 
+[← 길라잡이][project-guide]
+
 별도 조사(2026-10-09)에서 옮겼다. 조사는 열람 증거(HTTP 응답, 인용문)를 남기지 않았고 이 저장소에서 사실 확인을 하지 않았다.
 "확인"은 조사의 자기 보고이므로 잠정으로 읽는다. 필수 여부 열은 대부분 "명시 확인 못함"이어서 스키마의 `NOT NULL` 근거로 쓰면 안 된다.
 읽을 수 있는 사실은 bmson `info.init_bpm`(미지정 시 치명적 오류), Clone Hero `Name`(위키상 필수 태그), osu! 기본값(`PreviewTime` -1, `Mode` 0), bmson `resolution` 기본 240 정도다.
@@ -45,7 +47,7 @@ osu! (`ppy/osu-wiki` 저장소, 커밋 `85834aa`, 2026-10-13 커밋, osu! 파일
 - `.sm`, `.ssc`, `.chart`는 파일 하나에 채보가 여럿이다. "채보 파일 하나 = 패턴 하나"라는 [스키마][nav-2]의 가정이 이 포맷들에서는 성립하지 않는다.
 - 곡 단위 메타가 채보 파일 밖에 있는 포맷(Clone Hero `song.ini`, Beat Saber `Info.dat`)과 채보마다 중복 기재하는 포맷(osu!, StepMania)이 있다.
 - 참조 필드의 모양이 BMS의 (헤더, 인덱스, 원문 경로)와 다르다. 키·태그형(osu!, StepMania, KSH), 배열 원소형(bmson), 이름 관행형(Clone Hero)이 있다.
-- [지원 대상][nav-3]의 단계 표(1절)는 DTX, Quaver `.qua`, `.sng`를 지원 후보로 적었는데, 이 조사는 세 포맷 모두 필드를 확인하지 못했다. 다른 경로로 얻은 값일 수 있고 어느 쪽이 맞는지 모른다.
+- [조사 대상 파악][nav-3]의 단계 표(1절)는 DTX, Quaver `.qua`, `.sng`를 지원 후보로 적었는데, 이 조사는 세 포맷 모두 필드를 확인하지 못했다. 다른 경로로 얻은 값일 수 있고 어느 쪽이 맞는지 모른다.
 
 ## 보컬형 매체의 표기 (2026-10-14)
 
@@ -69,3 +71,4 @@ Rock Band 계열 보컬 MIDI (`YARC-Official/YARG.Core` 저장소, 커밋 `d42b9
 [nav-1]: ../bms-grammar.md
 [nav-2]: ../../cataloging/schema.md
 [nav-3]: ../formats.md
+[project-guide]: ../../index.md

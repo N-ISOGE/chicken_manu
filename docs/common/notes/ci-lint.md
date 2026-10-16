@@ -1,5 +1,7 @@
 # CI 린트 (super-linter)
 
+[← 길라잡이][project-guide]
+
 PR을 만들거나 갱신하면 CI 린트가 통과하는지 확인하고, 통과하기 전에는 병합하지 않는다.
 
 ## 1. 구성
@@ -165,3 +167,4 @@ foreach ($p in $Paths) {
 ```
 
 [nav-1]: ../notes.md
+[project-guide]: ../../index.md

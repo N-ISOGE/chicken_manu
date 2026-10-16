@@ -1,5 +1,7 @@
 # 스키마와 식별자
 
+[← 길라잡이][project-guide]
+
 작성해 둔 MariaDB 스키마(`chicken_menu`)와 논리적 데이터 모델 설계서(2024-12-19, 2차)를 요약하고,
 해시·고유식별자·IPFS 관점에서 검토한 결과를 적는다. 이 문서는 스키마 변경안을 설계하지 않고 관찰과 결정 사항만 남긴다.
 
@@ -96,3 +98,4 @@
 [nav-2]: ../survey/bms-grammar.md
 [nav-3]: ../preservation/adoption.md
 [nav-4]: ../common/references/preservation.md
+[project-guide]: ../index.md
