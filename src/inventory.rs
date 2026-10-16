@@ -83,10 +83,10 @@ mod tests {
     fn invalid_input_does_not_create_output() {
         let workspace = Workspace::new();
         let output = workspace.0.join("result.readed");
-        assert!(write_inventory(&workspace.0.join("missing"), &output, |_| {
+        let result = write_inventory(&workspace.0.join("missing"), &output, |_| {
             panic!("must not run")
-        })
-        .is_err());
+        });
+        assert!(result.is_err());
         assert!(!output.exists());
     }
 
