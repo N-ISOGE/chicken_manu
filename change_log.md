@@ -34,8 +34,12 @@
 
 ### Changed
 
+- `docs/`를 조사(`survey`), 정리(`cataloging`), 보존(`preservation`), 공통(`common`) 폴더로 나누고 각 중심 안내에서 상세 문서로 연결한다. README의 기존 구성 안에서 설명을 줄이고 네 안내 문서로 연결했다. GitHub·rustdoc의 경로와 확인 상태 안내를 함께 맞췄다.
+- `docs/index.md`를 프로젝트 길라잡이로 정리했다. 문서별 요약과 전체 목차, 질문별 읽는 경로, 조사·정리·보존의 방향, 매체와 관련 자료의 기록·활용 기준을 안내한다. README의 용어와 목적을 맞추고 GitHub와 rustdoc에서 상세 문서로 연결한다.
+- 채보 단위 문서(`docs/formats/chart-units.md`)에 StepMania, YARG, osu!(mania)의 특정 판본 소스와 문서를 직접 열어 대조한 내용을 `특정 판본의 소스 열람` 절로 추가했다(로더 선택 순서, 채보 생성 단위, 재선택 비교, `.chart`와 `.mid` 리더의 입력 조건, mania 열 계산). 실행으로 확인한 값은 없다.
 - 지원 대상 문서(`docs/formats.md`)에서 저장소 안에서 확인할 수 없는 표기와 집계를 빼고 공개 근거만 남겼다. 보강 제안 문서는 `docs/formats/format-checks.md`(포맷별 추가 확인 사항)로 바꾸고 현재→제안 열을 뺐다. 표의 등급 표기는 확인 상태(확인·부분·미확인)만 남기고 뺐다.
 - 지원 대상 문서의 2절에서 포맷 분류 이름 목록을 빼고 조사 원칙만 남겼다. 3단계 행의 "특수규칙·레벨형"은 "특수 규칙 포맷"으로 바꿨다.
+- 채보 단위 문서(`docs/formats/chart-units.md`)에 보컬형 매체의 표기(UltraStar 형식 문서 1.1.0, YARG가 읽는 Rock Band 계열 보컬 MIDI 규칙)를 직접 열어 대조한 내용을 `보컬형 매체의 표기` 절로 추가했다. 실행으로 확인한 값은 없다.
 - 포맷 식별자 체계의 방향(이름 슬러그를 기본으로 하고 외부 ID는 선택 필드)을 `docs/formats.md` 1절에 적었다.
 - 린트 워크플로 폴더 이름의 오타를 고쳤다(`.github/workflow` → `.github/workflows`). GitHub Actions는 `workflows`만 읽는다.
 - 린트 워크플로를 갱신했다. `actions/checkout` v4→v6(Node 20 지원 중단 경고), super-linter v6.8.0→v8.7.0, `ubuntu-latest`→`ubuntu-24.04`(2026-10-19부터 `ubuntu-latest`가 Ubuntu 26으로 바뀐다).

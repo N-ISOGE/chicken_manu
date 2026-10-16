@@ -1,5 +1,7 @@
 # CI 린트 (super-linter)
 
+[← 길라잡이][project-guide]
+
 PR을 만들거나 갱신하면 CI 린트가 통과하는지 확인하고, 통과하기 전에는 병합하지 않는다.
 
 ## 1. 구성
@@ -9,7 +11,7 @@ PR을 만들거나 갱신하면 CI 린트가 통과하는지 확인하고, 통�
   - `.markdown-lint.yml`: 줄 길이는 400자이고 표는 줄 길이 검사에서 뺀다(표 행은 줄을 나눌 수 없다). MD004, MD029, MD033, MD036은 끈다. MD060(표 열 정렬)은 켜져 있다.
   - `.codespellrc`: `lazer`, `readed`를 허용하고 `.gitignore`와 `LICENSES`는 검사에서 뺀다.
   - `.jscpd.json`: 중복 코드 검사. 임계값 0, `.md`는 제외한다.
-- 마크다운 서식 검사(`MARKDOWN_PRETTIER`)는 모든 문서가 맞춰질 때까지 워크플로에서 끈다([프로젝트 노트](crate::docs::notes)의 "마크다운 서식").
+- 마크다운 서식 검사(`MARKDOWN_PRETTIER`)는 모든 문서가 맞춰질 때까지 워크플로에서 끈다([프로젝트 노트][nav-1]의 "마크다운 서식").
 - JSON 파일은 biome과 prettier의 서식 검사를 받는다.
 
 ## 2. 결과 확인
@@ -163,3 +165,6 @@ foreach ($p in $Paths) {
     } else { "{0}: already aligned" -f $p }
 }
 ```
+
+[nav-1]: ../notes.md
+[project-guide]: ../../index.md

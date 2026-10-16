@@ -1,4 +1,29 @@
-#![doc = include_str!("../docs/index.md")]
+// GitHub에서는 Markdown 상대 경로를, rustdoc에서는 같은 이름의 모듈 참조를 사용한다.
+#![doc = concat!(
+    "[doc-1]: crate::docs::survey::formats\n",
+    "[doc-2]: crate::docs::survey::formats::chart_units\n",
+    "[doc-3]: crate::docs::cataloging::schema\n",
+    "[doc-4]: crate::docs::survey::bms_grammar\n",
+    "[doc-5]: crate::docs::survey::bms_parsers\n",
+    "[doc-6]: crate::docs::preservation::adoption\n",
+    "[doc-7]: crate::docs::common::references\n",
+    "[doc-8]: crate::docs::common::notes\n",
+    "[doc-9]: crate::docs::survey::formats::commercial\n",
+    "[doc-10]: crate::docs::survey::formats::format_checks\n",
+    "[doc-11]: crate::docs::common::references::bms\n",
+    "[doc-12]: crate::docs::common::references::standards\n",
+    "[doc-13]: crate::docs::common::references::charts\n",
+    "[doc-14]: crate::docs::common::references::preservation\n",
+    "[doc-15]: crate::docs::common::notes::ci_lint\n",
+    "[doc-16]: crate::docs::common::changelog\n",
+    "[doc-17]: ../src/chicken_manu/main.rs.html\n",
+    "[doc-18]: crate::docs::survey\n",
+    "[doc-19]: crate::docs::cataloging\n",
+    "[doc-20]: crate::docs::preservation\n",
+    "[doc-21]: crate::docs::common\n",
+    "\n",
+    include_str!("../docs/index.md")
+)]
 
 pub mod docs;
 
