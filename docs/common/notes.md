@@ -1,8 +1,10 @@
 # 프로젝트 노트
 
+[← 길라잡이][project-guide]
+
 이전 `change_log.md`에 있던 로드맵과 "문제들"을 옮긴 것이다.
-버전별 변동사항은 저장소 루트의 `change_log.md`(rustdoc의 [변경 기록](crate::docs::changelog))에 있다.
-참고 자료는 [참고 자료](crate::docs::references), BMS 문법 초안은 [BMS 문법](crate::docs::bms_grammar)으로 옮겼다.
+버전별 변동사항은 저장소 루트의 `change_log.md`(rustdoc의 [변경 기록][nav-1])에 있다.
+참고 자료는 [참고 자료][nav-2], BMS 문법 초안은 [BMS 문법][nav-3]으로 옮겼다.
 
 ## 로드맵
 
@@ -44,9 +46,11 @@
 
 나누는 방법:
 
-- 상위 문서(`docs/<이름>.md`)는 목차와 공통 설명만 남기고, 하위 문서는 `docs/<이름>/` 폴더에 둔다.
-  예: `docs/references.md`와 `docs/references/`, `docs/formats.md`와 `docs/formats/`.
-- 새 하위 문서는 `src/docs.rs`에서 상위 모듈 안의 모듈로 싣고(`crate::docs::references::bms`), 상위 문서와 `docs/index.md`의 목차에 넣는다.
+- 조사·정리·보존·공통의 중심 안내는 각각 `docs/survey/index.md`, `docs/cataloging/index.md`, `docs/preservation/index.md`, `docs/common/index.md`에 둔다.
+- 주제 문서는 해당 관점의 폴더에 두고, 하위 문서가 필요하면 주제 이름의 폴더로 나눈다.
+  예: `docs/common/references.md`와 `docs/common/references/`, `docs/survey/formats.md`와 `docs/survey/formats/`.
+- 새 하위 문서는 `src/docs.rs`에서 해당 관점의 상위 모듈 안에 싣고(`crate::docs::common::references::bms`), 중심 안내·상위 주제 문서와 `docs/index.md`의 목차에서 찾을 수 있게 한다.
+- 문서 사이에는 참조형 링크와 Markdown 상대 경로를 사용한다. rustdoc 모듈에서는 같은 참조 이름에 모듈 링크를 먼저 정의해 GitHub와 rustdoc에서 각각 이동할 수 있게 한다.
   절 번호로 다른 문서를 가리킨 곳(`... N절`)이 있으면 함께 고친다.
 - 이 기준은 이 저장소의 운영 결정이며, 외부 가이드라인과 대조해 확인한 것은 아니다. 크기는 나눌지 살펴보는 신호로만 쓴다.
 
@@ -54,9 +58,9 @@
 
 - md는 prettier(3.3.3)로 맞춘다: `npx prettier@3.3.3 --write <파일>`.
 - 전체를 한 번에 바꾸지 않고 **고치는 파일부터** 맞춘다. 서식 검사(`MARKDOWN_PRETTIER`)는 모든 파일이 맞춰질 때까지 워크플로에서 끈다.
-- 표를 고치면 열 너비를 다시 맞춘다(MD060). CI 린트의 확인 방법, 자주 걸리는 실패, 병합 방식은 [CI 린트](crate::docs::notes::ci_lint)에 있다.
+- 표를 고치면 열 너비를 다시 맞춘다(MD060). CI 린트의 확인 방법, 자주 걸리는 실패, 병합 방식은 [CI 린트][nav-4]에 있다.
 - 아직 맞추지 않은 파일은 `npx prettier@3.3.3 --check "**/*.md"`로 볼 수 있다.
-  맞춘 파일: `docs/bms-parsers.md`, `docs/references.md`, `docs/formats.md`, `docs/schema.md`, `docs/adoption.md`, `docs/bms-grammar.md`, `docs/index.md`, `docs/notes.md`, `docs/references/`와 `docs/formats/`의 하위 문서 전체.
+  `README.md`와 `docs/`의 중심 안내·상세 문서는 같은 서식 기준으로 맞춘다.
 
 ## 문제들
 
@@ -67,8 +71,15 @@
 
 _(정리 시 추가)_ 위 질문들과 조사 결과의 대응.
 
-| 문제               | 조사에서 알게 된 것                                                                                                     |
-| ------------------ | ----------------------------------------------------------------------------------------------------------------------- |
-| 이거가 있었나?     | BMS Search는 곡 목록 사이트이고 개발자용 API 문서는 찾지 못했다                                                         |
-| 이 파일이 맞나?    | 채보 파일은 MD5 또는 SHA-256(원시 바이트)로 식별하는 것이 BMS 생태계의 관행이다([스키마와 식별자](crate::docs::schema)) |
-| 이거를 뭐라 부르냐 | 스키마에서는 패턴(pattern), 파일 묶음은 binder로 정했다                                                                 |
+| 문제               | 조사에서 알게 된 것                                                                                       |
+| ------------------ | --------------------------------------------------------------------------------------------------------- |
+| 이거가 있었나?     | BMS Search는 곡 목록 사이트이고 개발자용 API 문서는 찾지 못했다                                           |
+| 이 파일이 맞나?    | 채보 파일은 MD5 또는 SHA-256(원시 바이트)로 식별하는 것이 BMS 생태계의 관행이다([스키마와 식별자][nav-5]) |
+| 이거를 뭐라 부르냐 | 스키마에서는 패턴(pattern), 파일 묶음은 binder로 정했다                                                   |
+
+[nav-1]: ../../change_log.md
+[nav-2]: references.md
+[nav-3]: ../survey/bms-grammar.md
+[nav-4]: notes/ci-lint.md
+[nav-5]: ../cataloging/schema.md
+[project-guide]: ../index.md

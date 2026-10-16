@@ -1,5 +1,7 @@
 # 포맷별 추가 확인 사항
 
+[← 길라잡이][project-guide]
+
 별도 조사(2026-10-08)가 아래 포맷 9건에서 새로 확인한 사실이다. 이 저장소가 다시 확인한 값이 아니며, 확인 상태 열은 조사가 스스로 적은 값이다.
 
 | 자료                       | 새로 확인한 것                                                                                            | 확인 상태                                                             |
@@ -15,3 +17,5 @@
 | ADOFAI `.adofai`           | 이동 각도로 시간 결정: `t = (theta / 180) * (60000 / BPM)` ms. `pathData` 문자열 → `angleData` 실수 배열  | 확인. 근거가 Steam 커뮤니티 페이지·튜토리얼이라 1차 명세인지는 미확인 |
 
 `.chart`의 근거 주소로 `github.com/TheNathannator/GuitarGame_ChartFormats`, `solamint.github.io/GuitarGame_ChartFormats/`, `thenathannator.github.io/…`가 나오는데 같은 자료인지는 확인하지 못했다. 세 값을 합치지 않았다.
+
+[project-guide]: ../../index.md

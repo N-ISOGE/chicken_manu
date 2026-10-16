@@ -1,5 +1,7 @@
 # 참고 자료: 채보 포맷 색인, 엔진·파서·변환기, 에디터
 
+[← 길라잡이][project-guide]
+
 채보 포맷을 모아 둔 색인과, 포맷을 읽고 쓰는 엔진·파서·변환기, 채보 에디터·저작 도구의 링크다.
 2절과 3절의 행은 별도 조사(2026-10-09)에서 옮겼다. 상태 열은 조사가 스스로 적은 확인 수준이다. 이 저장소가 다시 확인한 값이 아니다. 조사가 서로 다른 값을 낸 곳은 나중 조사(재확인)를 따랐다.
 
@@ -74,3 +76,5 @@ vsrg-format-docs만 별도의 재확인 조사가 직접 열어 확인했다.
 
 보존 관점의 주의: 소스가 공개돼도 프로젝트 라이선스가 없는 도구(Magma: Rok On Edition, Beafowl/ksm-editor), GPL 표기와 원본 코드 권리 유보가 함께 있는 도구(ArrowVortex),
 일부 자산만 비상업인 도구(Phichain)가 있다. FeedBack, Re:PhiEdit 원본, MikuMikuWorld 원본, Margrete, Beat Saber 편집기의 라이선스는 미확인이다.
+
+[project-guide]: ../../index.md

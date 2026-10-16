@@ -1,7 +1,9 @@
 # 기술 채택 판단
 
+[← 길라잡이][project-guide]
+
 2026-10-08 기준 사전 조사 결과다. 2026-10-09 별도 조사에서 알게 된 것은 4절, 5절, 10절에 따로 표시했다. 구현 계획이 아니며, 채택 전에 버전과 라이선스를 다시 확인해야 한다.
-근거 링크는 [참고 자료](crate::docs::references)에 있다.
+근거 링크는 [참고 자료][nav-1]에 있다.
 
 ## 1. 판정 요약
 
@@ -24,7 +26,7 @@
 2. **식별자가 5종이다.** MD5, SHA-256, SHA3-256, IPFS CID, BLAKE3. 단일 content ID가 없다.
 3. **CID 기본값이 구현마다 다르다.** kubo 기본은 CIDv0, 256KiB, 링크 174, raw leaves 없음이다. `unixfs-v1-2025` 프로파일은 CIDv1, 1MiB, 링크 1024다. rust-unixfs 기본은 CIDv1 + raw leaves인데 256KiB/174라서 이름 있는 프로파일이 아닌 조합이다.
 4. **네이티브 IPFS와 iroh는 공유하는 것이 없는 별개 트랙이다.** libp2p 버전과 해시 체계가 모두 다르다.
-5. **저작권·재배포 조건은 조건의 내용을 조사하지 못했다.** 곡·그림·영상의 배포 조건, 행사별 약관, 삭제 요청 처리가 해당한다. 2026-10-09에 별도 조사가 BMS 행사 규약(BOF21, 무명전), osu! 정책 3건, 한국·일본·미국 법령의 **원문 위치**를 모았지만 조항 내용은 요약하지 않았고, StepMania·ITG 배포처는 열지 못했다([참고 자료](crate::docs::references::preservation) 2절).
+5. **저작권·재배포 조건은 조건의 내용을 조사하지 못했다.** 곡·그림·영상의 배포 조건, 행사별 약관, 삭제 요청 처리가 해당한다. 2026-10-09에 별도 조사가 BMS 행사 규약(BOF21, 무명전), osu! 정책 3건, 한국·일본·미국 법령의 **원문 위치**를 모았지만 조항 내용은 요약하지 않았고, StepMania·ITG 배포처는 열지 못했다([참고 자료][nav-2] 2절).
 
 ## 3. IPFS와 kubo
 
@@ -69,14 +71,14 @@
 - METS-schema 저장소는 릴리스·태그가 없고 LICENSE 파일이 없으며 마지막 커밋이 2025-03-12다. XSD를 특정 커밋으로 고정해 저장소에 포함하는 것을 권장한다(헤더의 CC0 표기를 인용).
 - 해시 이름 철자는 하나로 정해야 한다. METS 제안 값은 `SHA-256`, IANA는 소문자 `sha3-256`(blake3 없음), CycloneDX는 `SHA3-256`·`BLAKE3`, multicodec은 `sha3-256`(0x16)·`blake3`(0x1e)다.
 - METS 2 profile 문서, 마이그레이션 노트, 예제, 도구는 읽지 못했다.
-- 대안 비교: 처음에는 2차 정보만 있어 제외했다. 2026-10-09에 별도 조사가 BagIt(RFC 8493)과 OCFL 1.1의 핵심 규정을 직접 읽어 정리했고, RO-Crate, OAIS, MAME software list, No-Intro/Redump, SWHID, Data Package, 인터넷 아카이브는 인덱스·소개 수준(부분)이다([참고 자료](crate::docs::references::preservation) 1절, [스키마](crate::docs::schema) 4절). 비교와 판정은 조사가 하지 않았으므로 이 문서도 판정하지 않는다.
+- 대안 비교: 처음에는 2차 정보만 있어 제외했다. 2026-10-09에 별도 조사가 BagIt(RFC 8493)과 OCFL 1.1의 핵심 규정을 직접 읽어 정리했고, RO-Crate, OAIS, MAME software list, No-Intro/Redump, SWHID, Data Package, 인터넷 아카이브는 인덱스·소개 수준(부분)이다([참고 자료][nav-3] 1절, [스키마][nav-4] 4절). 비교와 판정은 조사가 하지 않았으므로 이 문서도 판정하지 않는다.
 - BagIt은 SHA-256·SHA-512 지원을 도구의 필수로 하고 OCFL은 콘텐츠 주소에 `sha512`·`sha256`만 허용한다. 둘 다 SHA3-256이 필수·허용 집합에 없어서, 3절의 "필수 해시 집합" 논의에 SHA-512 보관 여부가 추가된다.
 
 ## 5. BMS 파서와 인코딩
 
 - bms-rs 1.0.0은 Apache-2.0이라 GPL-3.0과 호환된다(GPLv2-only와는 아님). 파일 참조 헤더(`stage_file`, `banner`, `#WAVxx` 등)를 `PathBuf`로 노출하고 `#RANDOM`의 모든 분기를 보존한다. 반면 `&str`만 받아 인코딩 감지가 없고, BOM 제거와 경로 정규화(역슬래시, 대소문자)가 없으며, `#BASE 62` 지원은 확인하지 못했다. 릴리스마다 파싱 API가 바뀌고 유지보수자는 1~2명이다.
 - 인코딩 판별 순서 권고: BOM → 엄격한 UTF-8 → 엄격한 Shift_JIS(`decode_without_bom_handling_and_without_replacement`) → chardetng → 손실 디코딩(메타데이터에 표시). beatoraja의 순서와 달라서 두 프로그램이 같은 파일을 다르게 읽을 수 있다.
-- WHATWG Shift_JIS는 `0x5C`를 백슬래시로 유지한다. CP932와의 차이(웨이브 대시 `0x8160`, NEC 13행 `0x8790` 등)를 2026-10-09에 한 PC의 BMS 샘플 189개로 시험했고, MS932와 엄격 Shift_JIS의 결과가 같았다(차이 나는 파일 0, 두 바이트 모두 샘플에 없음). 샘플 밖에서는 갈릴 수 있고 BOM 파일과 비ASCII UTF-8 파일이 샘플에 없어 그 경로는 검증하지 못했다(`docs/bms-parsers.md` 2.1절).
+- WHATWG Shift_JIS는 `0x5C`를 백슬래시로 유지한다. CP932와의 차이(웨이브 대시 `0x8160`, NEC 13행 `0x8790` 등)를 2026-10-09에 한 PC의 BMS 샘플 189개로 시험했고, MS932와 엄격 Shift_JIS의 결과가 같았다(차이 나는 파일 0, 두 바이트 모두 샘플에 없음). 샘플 밖에서는 갈릴 수 있고 BOM 파일과 비ASCII UTF-8 파일이 샘플에 없어 그 경로는 검증하지 못했다(`docs/survey/bms-parsers.md` 2.1절).
 - 해시는 항상 **디코딩 전 원시 바이트**에서 계산한다.
 
 ## 6. iroh
@@ -131,3 +133,9 @@
 7. iroh: Windows `FsStore`, 직접·릴레이 전송, push 거부 설정, 릴레이 약관.
 8. 저작권·재배포 조건: 원문 위치 일부를 모았을 뿐 조항 내용은 요약하지 못했다. 남은 것: 범위를 넓힌 후속 조사의 결과, StepMania·ITG 배포처, 한국·일본 법령 조문, 37 CFR §201.40(b)(19) 본문, BOF·무명전 규약의 게시일.
 9. 보존·교환 포맷 선행사례의 재확인: 본문을 열지 못한 6건(RO-Crate, SWHID 승인 명세, No-Intro·Redump DAT, MAME DTD, Data Package 경로 규칙, CCSDS 650.0-M-3)의 재확인. 결과가 아직 없다.
+
+[nav-1]: ../common/references.md
+[nav-2]: ../common/references/preservation.md
+[nav-3]: ../common/references/preservation.md
+[nav-4]: ../cataloging/schema.md
+[project-guide]: ../index.md

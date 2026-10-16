@@ -1,5 +1,7 @@
 # 참고 자료: 보존·교환 포맷과 재배포 조건
 
+[← 길라잡이][project-guide]
+
 보존·교환 포맷의 선행사례와, 재배포 조건이 적힌 규약·정책·법령의 원문 위치다. 별도 조사(2026-10-09)에서 옮겼다.
 상태 열은 조사가 스스로 적은 확인 수준이고 이 저장소가 다시 확인한 값이 아니다. 이 문서는 법률 자문이 아니다.
 
@@ -39,3 +41,5 @@
 | StepMania·ITG 팩 배포처                                                                                                                                                                                   | 미확인 | 규칙 문서가 있는 배포처 1~3곳을 열지 못했다. 후보로만 [Simfile Archive](https://simfilearchive.dev/), FFR 제출 규칙(인접 생태계), [Zenius -I- vanisher](https://zenius-i-vanisher.com/v5.2/simfiles.php?category=help)(설치 도움말뿐)가 있고 재배포 조건 확인으로 세지 않는다 |
 | 대한민국 [저작권법](https://www.law.go.kr/법령/저작권법) · 일본 [著作権法](https://laws.e-gov.go.jp/law/345AC0000000048)                                                                                  | 부분   | 조문 번호·본문을 읽지 못했다(한국법은 페이지 표제의 개정·시행일만, 일본법은 검색 결과 일부).                                                                                                                                                                                  |
 | [17 U.S.C. §1201](https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title17-section1201&num=0&edition=prelim) · [Copyright Office 2024 절차](https://www.copyright.gov/1201/2024/)             | 부분   | 2024-10-28 최종 규칙의 III.A.14 「Video Games—Preservation and Abandoned Video Games」. 37 CFR §201.40(b)(19) 본문은 미독이고 번호는 검색 결과 의존. 2026-10 시점에도 현행인지는 조사가 다루지 않음.                                                                          |
+
+[project-guide]: ../../index.md
