@@ -78,7 +78,7 @@
 
 - bms-rs 1.0.0은 Apache-2.0이라 GPL-3.0과 호환된다(GPLv2-only와는 아님). 파일 참조 헤더(`stage_file`, `banner`, `#WAVxx` 등)를 `PathBuf`로 노출하고 `#RANDOM`의 모든 분기를 보존한다. 반면 `&str`만 받아 인코딩 감지가 없고, BOM 제거와 경로 정규화(역슬래시, 대소문자)가 없으며, `#BASE 62` 지원은 확인하지 못했다. 릴리스마다 파싱 API가 바뀌고 유지보수자는 1~2명이다.
 - 인코딩 판별 순서 권고: BOM → 엄격한 UTF-8 → 엄격한 Shift_JIS(`decode_without_bom_handling_and_without_replacement`) → chardetng → 손실 디코딩(메타데이터에 표시). beatoraja의 순서와 달라서 두 프로그램이 같은 파일을 다르게 읽을 수 있다.
-- WHATWG Shift_JIS는 `0x5C`를 백슬래시로 유지한다. CP932와의 차이(웨이브 대시 `0x8160`, NEC 13행 `0x8790` 등)를 2026-10-09에 한 PC의 BMS 샘플 189개로 시험했고, MS932와 엄격 Shift_JIS의 결과가 같았다(차이 나는 파일 0, 두 바이트 모두 샘플에 없음). 샘플 밖에서는 갈릴 수 있고 BOM 파일과 비ASCII UTF-8 파일이 샘플에 없어 그 경로는 검증하지 못했다(`docs/survey/bms-parsers.md` 2.1절).
+- WHATWG Shift_JIS는 `0x5C`를 백슬래시로 유지한다. CP932와의 차이(웨이브 대시 `0x8160`, NEC 13행 `0x8790` 등)를 2026-10-09에 한 PC의 BMS 샘플 189개로 시험했고, MS932와 엄격 Shift_JIS의 결과가 같았다(차이 나는 파일 0, 두 바이트 모두 샘플에 없음). 샘플 밖에서는 갈릴 수 있고 BOM 파일과 비ASCII UTF-8 파일이 샘플에 없어 그 경로는 검증하지 못했다(당시 문서의 [인코딩 참고 시험](https://github.com/N-ISOGE/chicken_manu/blob/f769f545e0fc2077c96211f741fe981c140ec9d6/docs/survey/bms-parsers.md#21-jbms-parser-beatoraja)).
 - 해시는 항상 **디코딩 전 원시 바이트**에서 계산한다.
 
 ## 6. iroh

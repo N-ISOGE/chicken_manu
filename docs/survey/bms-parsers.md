@@ -1,404 +1,85 @@
-<!-- markdownlint-disable MD024 -->
-
 # BMS 파서 구현 정리
 
 [← 길라잡이][project-guide]
 
-이 문서는 BMS 형식을 실제로 파싱하는 주요 도구 및 구동기의 구현을 정리한 것입니다.
-각 구현이 어떤 커맨드를 지원하는지, 인코딩을 어떻게 처리하는지,
-그리고 구현별로 특이한 동작을 기록합니다.
+BMS를 읽는 프로그램은 같은 줄을 받아도 다른 정보를 보존하거나 처리할 수 있습니다. 이 문서는 입력을 읽는 방식, 헤더의 처리, 인코딩 선택을 구분해 비교합니다.
 
----
+## 1. 비교에서 말하는 지원
 
-## 목차
+| 구분      | 의미                                 | 확인할 근거                        |
+| --------- | ------------------------------------ | ---------------------------------- |
+| 구문 수용 | 해당 줄을 오류 없이 읽음             | 파서 분기·정규식·오류 처리         |
+| 값 보존   | 이름·원문 값을 내부 자료구조에 남김  | 헤더 저장 경로와 자료구조          |
+| 의미 처리 | 값을 특정 속성·객체·동작으로 해석함  | 변환·로드·렌더링 등 후속 처리 경로 |
+| 실행 관찰 | 정해진 입력과 조건에서 결과를 관찰함 | 실행한 프로그램 판본, 입력과 결과  |
 
-1. [대상 목록](#1-대상-목록)
-2. [구현별 상세](#2-구현별-상세)
-   - 2.1 [jbms-parser (Beatoraja)](#21-jbms-parser-beatoraja)
-   - 2.2 [bms-js (Bemuse)](#22-bms-js-bemuse)
-   - 2.3 [BMSE](#23-bmse)
-   - 2.4 [iBMSC](#24-ibmsc)
-   - 2.5 [μBMSC](#25-μbmsc)
-   - 2.6 [Qwilight](#26-qwilight)
-3. [커맨드 지원 비교표](#3-커맨드-지원-비교표)
-4. [인코딩 처리 비교](#4-인코딩-처리-비교)
-5. [구현 간 차이 및 주의사항](#5-구현-간-차이-및-주의사항)
+임의의 헤더를 저장하는 파서가 있다고 해서 그 헤더의 기능까지 구현됐다고 판단하지 않습니다. 아래는 **소스의 정적 관찰**이며, 프로그램을 실행한 비교 결과는 없습니다.
 
----
+## 2. 판본을 고정해 확인한 구현
 
-## 1. 대상 목록
+2026-10-16에 다음 소스를 직접 읽었습니다. 링크의 커밋에 한정한 설명이며 배포된 실행 파일이나 다른 포크의 동작까지 일반화하지 않습니다.
 
-| 도구          | 종류                    | 언어       | 저장소                                                       |
-| ------------- | ----------------------- | ---------- | ------------------------------------------------------------ |
-| [jbms-parser] | 구동기 파서 (Beatoraja) | Java       | <https://github.com/exch-bms2/jbms-parser>                   |
-| [bms-js]      | 구동기 파서 (Bemuse)    | TypeScript | <https://github.com/bemusic/bemuse/tree/master/packages/bms> |
-| [BMSE]        | 편집기                  | VB.NET     | <https://github.com/Nekokan/BMSE>                            |
-| [iBMSC]       | 편집기                  | VB.NET     | <https://github.com/aqtq314/iBMSC>                           |
-| [μBMSC]       | 편집기 (iBMSC 포크)     | VB.NET     | <https://github.com/zardoru/iBMSC>                           |
-| [Qwilight]    | 구동기                  | —          | <https://taehui.ddns.net/ko> (소스 비공개)                   |
+| 구현               | 확인한 판본·파일                                                                                                    | 관찰 범위                                     |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------- | --------------------------------------------- |
+| BMSE, Nekokan 포크 | `26826aff6d51f34e0aa24284a68d9e713db6a007`의 [modInput.vb][bmse-input], [modEncoding.vb][bmse-encoding]             | 헤더 분기·값 저장, 인코딩 선택·자동 판별 경로 |
+| bms-js, Bemuse     | `4bf3e7d98a44841b323741cc403ecb7b41618ade`의 [compiler/index.ts][bemuse-compiler], [reader/index.ts][bemuse-reader] | 줄 분류, 헤더 보존, 일부 제어 흐름, 디코딩    |
 
-[jbms-parser]: https://github.com/exch-bms2/jbms-parser
-[bms-js]: https://github.com/bemusic/bemuse/tree/master/packages/bms
-[BMSE]: https://github.com/Nekokan/BMSE
-[iBMSC]: https://github.com/aqtq314/iBMSC
-[μBMSC]: https://github.com/zardoru/iBMSC
-[Qwilight]: https://taehui.ddns.net/ko
+### BMSE: 헤더를 속성과 슬롯에 옮기는 경로
 
----
+`LoadBMSHeader`에는 다음 헤더를 처리하는 분기가 있습니다. 목록은 읽기 경로의 관찰이며, 저장 후 재열기·게임 실행·변환의 정확성을 시험한 결과가 아닙니다.
 
-## 2. 구현별 상세
+| 대상                  | 소스에서 확인한 처리                                                                                                   |
+| --------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| 제목·제작자·난이도 등 | `#TITLE`, `#SUBTITLE`, `#ARTIST`, `#SUBARTIST`, `#GENRE`, `#PLAYER`, `#BPM`, `#PLAYLEVEL`, `#RANK`, `#DIFFICULTY` 분기 |
+| 관련 파일             | `#STAGEFILE`, `#PREVIEW`, `#BANNER`, `#BACKBMP` 분기와 `#WAVxx`·`#BMPxx` 슬롯 처리                                     |
+| 추가 속성             | `#TOTAL`, `#VOLWAV`, `#DEFEXRANK`, `#LNOBJ`, `#LNMODE`, `#COMMENT`, `#BASE` 분기                                       |
+| 타이밍·표시 슬롯      | `#BPMxx`, `#STOPxx`, `#SCROLLxx`, `#SPEEDxx`, `#BGAxx` 처리                                                            |
 
-### 2.1 jbms-parser (Beatoraja)
+`#BMPxx`·`#STAGEFILE`·`#SUBTITLE` 등을 미지원으로 표시할 수 없는 근거가 이 분기들입니다. 같은 이름의 BMSE라도 다른 판본에는 따로 확인이 필요합니다.
 
-- **파일**: `src/bms/model/BMSDecoder.java`
-- **저장소**: <https://github.com/exch-bms2/jbms-parser>
+`LoadBMSData`는 강제 재읽기 인코딩, 메뉴에서 지정한 인코딩, 자동 판별 경로를 구별합니다. 자동 판별 함수 `DetectEncoding`은 기본 64 KiB 표본에서 BOM을 먼저 확인하고 검증·추정 경로를 거칩니다. 끝까지 결정하지 못했을 때 쓰는 `defaultEncoding` 초기값은 Shift_JIS입니다. 따라서 인코딩 처리를 Windows 기본 코드페이지 하나로만 설명할 수 없습니다.
 
-#### 파싱 방식
+### bms-js: 헤더 보존과 의미 처리를 나누어 읽기
 
-- 한 줄씩 읽는 line-by-line 방식.
-- `matchesReserveWord(line, keyword)` 함수로 대소문자 무관 비교.
-- `#RANDOM` → `Deque<Integer>` 스택으로 중첩 처리.
-- `#IF` / `#ENDIF` / `#ENDRANDOM` 분기 처리.
-- `%KEY value` 형식 및 `@KEY value` 형식도 처리 (`model.getValues().put(key, value)`).
+컴파일러는 줄을 나누고 앞뒤 공백을 정리한 뒤 제어 줄·마디 길이·채널·일반 헤더를 차례로 분류합니다. 일반 헤더 경로는 이름과 값을 `chart.headers`에 저장합니다. 이 경로만으로 `#PATH_WAV`·`#EXWAVxx` 등의 의미 처리 여부를 판단할 수는 없습니다.
 
-#### 인코딩
+- `#RANDOM`, `#IF`, `#ENDIF`에는 별도 처리 분기가 있습니다.
+- 이 파일의 제어 분기에는 `#ELSE`, `#ELSEIF`, `#SETRANDOM`, `#SWITCH`가 없습니다. 일반 헤더로 보존되는 것과 조건 분기로 동작하는 것은 구별합니다.
+- `#BASE`를 먼저 찾아 헤더 저장 방식에 반영하는 경로가 있습니다. 후속 처리 전체의 62진 지원 범위는 이 관찰만으로 확정하지 않습니다.
+- 채널 처리에서 데이터 길이의 절반을 내림해 객체 수를 구합니다. 수용됐다는 사실이 형식 전체의 유효성 검증을 뜻하지 않습니다.
 
-- 기본값은 `"MS932"`(Shift_JIS)이고, 파일의 앞 64KB로 `detectEncoding`을 호출해 인코딩을 고른다
-  (`BMSDecoder.java`, master 브랜치, 2026-10-08 원문 확인).
-- 순서: BOM(UTF-32BE, UTF-32LE, UTF-8, UTF-16BE, UTF-16LE)을 먼저 보고, BOM이 없으면
-  EUC-KR → MS932 → UTF-8 → UTF-16/32 순으로 시험한다. 모두 맞지 않으면 MS932다.
-- 읽기는 `new InputStreamReader(new ByteArrayInputStream(data), encoding)`. BOM을 제거하는 코드는 찾지 못했다(코드를 읽고 한 추정, 실행 검증 없음).
-- 참고 시험(2026-10-09, 확인 수준: 부분): 한 PC의 BMS 샘플 189개(ASCII만 85, CP932 96, EUC-KR 8, BOM 0)에서
-  위 판정 순서를 Rust(`encoding_rs`)로 근사해 보았다. jbms-parser를 실행한 결과가 아니라 "엄격 디코딩 + 줄바꿈 또는 `#` 존재 여부"
-  조건으로 흉내 낸 것이다. 근사에서 ASCII만 있는 85개와 비ASCII EUC-KR 8개는 EUC-KR로, CP932 96개는 MS932로 판정됐다.
-  EUC-KR이 ASCII만 있는 파일도 통과시키기 때문이다. 엄격 UTF-8 우선 방식과 라벨이 다른 181개는 모두 디코딩 텍스트가 같았다(텍스트가 다른 파일 0).
-  이 샘플에는 비ASCII UTF-8 파일과 BOM이 있는 파일이 없어서 UTF-8과 BOM 경로는 검증하지 못했다.
-- 파일 해시: MD5 + SHA-256 모두 계산.
+리더는 `forceEncoding`이 있으면 이를 사용하고, 없으면 `bemuse-chardet`을 호출합니다. `iconv-lite`로 디코딩한 문자열의 맨 앞이 U+FEFF이면 제거합니다. 감지 라이브러리 내부의 규칙과 실제 표본별 결과는 별도 확인이 필요합니다.
 
-#### 지원 커맨드 (CommandWord enum)
+## 3. 같은 기준으로 비교하기
 
-`PLAYER`, `GENRE`, `TITLE`, `SUBTITLE`, `ARTIST`, `SUBARTIST`, `PLAYLEVEL`,
-`RANK`, `DEFEXRANK`, `TOTAL`, `VOLWAV`, `STAGEFILE`, `BACKBMP`, `PREVIEW`,
-`LNOBJ`, `LNMODE`, `DIFFICULTY`, `BANNER`, `COMMENT`(stub; 파싱 후 무시),
-`BASE`(62진수 확장)
+| 질문                           | BMSE의 위 판본                                        | bms-js의 위 판본                                            |
+| ------------------------------ | ----------------------------------------------------- | ----------------------------------------------------------- |
+| 알려진 헤더를 어떻게 다루는가? | 개별 분기에서 편집기 속성·슬롯으로 옮김               | 일반 헤더 경로에서 이름·값을 저장하며 후속 의미 처리는 별도 |
+| 모르는 헤더를 보존하는가?      | 전체 읽기·저장 왕복에서의 보존 여부 추가 확인 필요    | 일반 헤더 정규식에 맞는 이름·값을 보존                      |
+| 조건 분기를 어디서 처리하는가? | 읽기 루프와 헤더 처리 범위의 전체 동작 추가 확인 필요 | 컴파일러에 RANDOM·IF·ENDIF 처리 분기 존재                   |
+| 인코딩은 어떻게 고르는가?      | 사용자 선택·강제 지정·자동 판별 경로                  | 수동 옵션 또는 감지 라이브러리                              |
+| 실행으로 확인했는가?           | 미수행                                                | 미수행                                                      |
 
-#### 타이밍 관련 특이사항
+## 4. 비교를 확장할 대상
 
-- **`#SCROLLxx`**: `scrolltable: Map<Integer, Double>` 에 저장.
-  인덱스는 `parseInt36(line, 7)` (36진수 파싱), 값은 `double`.
-  음수 허용.
-- `#BPM` 음수: WARNING 로그 후 무시.
-- `#STOP` 음수: `Math.abs()` 적용 후 WARNING.
+| 구현                    | 공개 자료                                                                                | 추가 확인할 내용                                                    |
+| ----------------------- | ---------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| jbms-parser / beatoraja | [jbms-parser](https://github.com/exch-bms2/jbms-parser), `src/bms/model/BMSDecoder.java` | 판본을 고정해 헤더·62진 인덱스·BPM/STOP·인코딩 경로 대조            |
+| iBMSC                   | [aqtq314/iBMSC](https://github.com/aqtq314/iBMSC), `source/iBMSC/iBMSC/Form1.vb`         | 읽기와 쓰기, `#EXRANK`·`#DEFEXRANK`, BPM/STOP 범위와 내부 수치 표현 |
+| μBMSC                   | [zardoru/iBMSC](https://github.com/zardoru/iBMSC), `iBMSC/ChartIO.vb`                    | iBMSC와의 판본별 차이, `#BMP`·`#SCROLLxx`·`SC` 채널, 저장 왕복      |
+| Qwilight                | [프로젝트 안내](https://taehui.ddns.net/ko)                                              | 비교 근거가 되는 파서 소스·배포 판본과 입력·결과 확보               |
 
-#### 채널 처리
+위 대상은 판본과 처리 범위를 고정한 뒤 비교표에 추가합니다. 미확인은 미지원과 구별합니다. MS932·Shift_JIS·EUC-KR·UTF-8의 이름과 실제 디코딩 결과도 나누어 기록해야 합니다.
 
-- `Section` 객체로 분리하여 `makeTimeLines()` 호출.
+## 5. 남은 검증
 
----
+소스에서 읽은 처리와 실제 프로그램의 동작을 대조하려면 공개 가능한 합성 입력으로 중복 헤더, 파일 참조, 분기, 홀수 길이 채널, BOM과 비ASCII 텍스트를 확인해야 합니다. 편집기에서는 읽기뿐 아니라 저장 후 정보가 유지되는지도 확인합니다.
 
-### 2.2 bms-js (Bemuse)
+이 비교는 BMS 형식을 설명하는 [문법 초안][grammar]을 검토하는 근거입니다. 여러 구현에 분기가 존재한다는 사실만으로 특정 확장을 모든 프로그램의 공통 규칙으로 확정하지 않습니다.
 
-- **파일**: `packages/bms/src/reader/index.ts`, `packages/bms/src/compiler/index.ts`
-- **저장소**: <https://github.com/bemusic/bemuse/tree/master/packages/bms>
-
-#### 파싱 방식
-
-정규식 기반 매처 (`compiler/index.ts`):
-
-| 패턴           | 처리                                   |
-| -------------- | -------------------------------------- |
-| `#RANDOM \d+`  | 제어흐름 — 난수 범위 설정              |
-| `#IF \d+`      | 제어흐름 — 조건 분기                   |
-| `#ENDIF`       | 제어흐름 — 분기 종료                   |
-| `#DDD02:\S+`   | 박자 변경 (measure 02 채널)            |
-| `#DDD\S\S:\S+` | 채널 데이터                            |
-| `#\w+ \S+`     | 헤더 (`chart.headers.set(key, value)`) |
-
-- 헤더를 `Map<string, string>`으로 저장 (타입 검증 없음).
-- DTX 형식도 지원 (`:` 구분자 방식).
-
-#### 인코딩
-
-- `bemuse-chardet` 라이브러리로 인코딩 자동 감지.
-- `iconv-lite`로 디코딩.
-- [hitkey의 `#CHARSET` 섹션 알고리즘](http://hitkey.nekokan.dyndns.info/cmds.htm#CHARSET)을 준거로 함.
-- `forceEncoding` 옵션으로 수동 지정 가능.
-- BOM(U+FEFF) 자동 제거.
-
-#### 미구현 항목
-
-`#ELSEIF`, `#SWITCH`, `#SETRANDOM` — 단순 `RANDOM` / `IF` / `ENDIF`만 처리.
-
----
-
-### 2.3 BMSE
-
-- **파일**: `modInput.vb`
-- **저장소**: <https://github.com/Nekokan/BMSE>
-
-#### 파싱 방식
-
-- `Case` 문으로 키워드 분기 (대소문자 무관).
-- `Case "#IF", "#RANDOM", "#RONDAM"` — `#RONDAM` 오타 변형도 처리.
-- PLAYER_TYPE: `1P` / `2P` / `DP` / `PMS` / `OCT`.
-
-#### 인코딩
-
-- VB.NET 기본 코드페이지 (Windows 시스템 설정에 따름).
-- **주의**: 이 절은 조사한 소스 리비전을 기록하지 않았다. 이후 검토에서 `modInput.vb`가 수동 지정과
-  `DetectEncoding` 자동 감지도 지원한다는 지적이 있었으나, 원문을 찾지 못해 확인하지 못했다(`미확인`).
-
-#### 채널 정의 (OBJ_CH enum 일부)
-
-`CH_SCROLL(1020)`, `CH_SPEED(1033)` 포함 — **`#SCROLLxx` 지원**.
-
-#### 파싱하지 않는 헤더
-
-> **주의**: 아래 목록도 조사한 리비전을 기록하지 않았다. 이후 검토에서 `#BMP`, `#STAGEFILE`, `#SUBTITLE`, `#SUBARTIST`,
-> `#PREVIEW`, `#BANNER`, `#BACKBMP`, `#DEFEXRANK`, `#DIFFICULTY`, `#LNOBJ`, `#TOTAL`, `#VOLWAV`를 처리한다는 지적이 있었으나
-> 원문을 찾지 못해 확인하지 못했다(`미확인`). 이 목록과 비교표의 BMSE 열은 **과거 관찰로만** 읽을 것.
-
-- 파일 관련: `#BANNER`, `#BACKBMP`, `#EXBMPzz`, `#VIDEOFILE`, `#CHARFILE`,
-  `#MIDIFILE`, `#EXWAVzz`, `#PREVIEW`, `#MATERIALSWAV`, `#MATERIALSBMP`,
-  `#PATH_WAV`, `#CDDA`
-- 메타데이터 관련: `#SUBTITLE`, `#SUBARTIST`, `#MAKER`
-
----
-
-### 2.4 iBMSC
-
-- **파일**: `source/iBMSC/iBMSC/Form1.vb`
-- **저장소**: <https://github.com/aqtq314/iBMSC>
-
-#### 파싱 방식
-
-`OpenBMS(ByVal xStrAll As String)` 함수가 파일 전체 문자열을 받아 줄 단위로 처리.
-
-- `StartsWith` + `StringComparison.CurrentCultureIgnoreCase` 비교.
-- `#IF` / `#ENDIF` / `#SWITCH` / `#SETSWITCH` / `#ENDSW` 스택 처리.
-- `#RANDOM`은 `xExpansion` 문자열에 누적 후 별도 처리.
-
-#### 인코딩
-
-- `TextEncoding As System.Text.Encoding = System.Text.Encoding.Default` (기본값).
-- 설정 UI에서 "Text Encoding" 항목으로 변경 가능.
-- 파일 읽기: `My.Computer.FileSystem.ReadAllText(xPath, TextEncoding)`.
-
-#### 지원 헤더
-
-`#WAV`, `#BPM`(xx 및 초기값), `#STOP`, `#TITLE`, `#ARTIST`, `#GENRE`,
-`#PLAYER`, `#RANK`, `#PLAYLEVEL`, `#SUBTITLE`, `#SUBARTIST`,
-`#STAGEFILE`, `#BANNER`, `#BACKBMP`, `#DIFFICULTY`, `#EXRANK`,
-`#TOTAL`, `#COMMENT`, `#LNOBJ`
-
-- `#LNTYPE`은 주석 처리 (TODO).
-- `#SCROLLxx` **미지원** (분기 없음).
-- `#BMP` 미지원 — BGA 대신 다른 방식을 사용하는 목적으로 설계.
-
-#### 채널 처리
-
-- 채널 식별자: `Mid(sLineTrim, 5, 2)`, 7번째 문자가 `":"` 인지 확인.
-- BPM 범위: 0 < BPM < 65536 적용, 상한 초과 시 내부값 655359999로 클램프.
-  (`655359999 = 65535.9999 × 10000` — iBMSC는 BPM을 ×10000 정수로 저장하는 내부 표현)
-- STOP 범위: 동일하게 클램프.
-
----
-
-### 2.5 μBMSC
-
-- **파일**: `iBMSC/ChartIO.vb`
-- **저장소**: <https://github.com/zardoru/iBMSC> (iBMSC 포크)
-
-iBMSC에서 파생된 포크. 파싱 구조는 거의 동일하나 다음 차이가 있음.
-
-#### iBMSC와의 주요 차이
-
-| 항목            | iBMSC              | μBMSC                                |
-| --------------- | ------------------ | ------------------------------------ |
-| `#SCROLLxx`     | 미지원             | **지원** (`hSCROLL` 배열, `SC` 채널) |
-| `#BMP`          | 미지원             | **지원** (`hBMP` 배열)               |
-| `#DEFEXRANK`    | `#EXRANK`로 처리   | `#DEFEXRANK` 명시 지원               |
-| 기본 인코딩     | `Encoding.Default` | `Encoding.UTF8`                      |
-| BPM/STOP 클램프 | 있음               | 없음 ("No limits on BPM editing")    |
-
-#### SCROLL 구현 상세
-
-```vb
-ReDim hSCROLL(1295)
-...
-ElseIf sLineTrim.StartsWith("#SCROLL", ...) Then
-    hSCROLL(C36to10(Mid(sLineTrim, Len("#SCROLL") + 1, 2))) = _
-        Val(Mid(sLineTrim, Len("#SCROLL") + 4)) * 10000
-...
-If Channel = "SC" Then .Value = hSCROLL(C36to10(Mid(sLineTrim, xI1, 2)))
-```
-
-채널 식별자 목록에 `"SC"` 포함: `BMSChannelList() = {"01", "03", ..., "SC"}`.
-
----
-
-### 2.6 Qwilight
-
-- **저장소**: <https://taehui.ddns.net/ko> (소스 비공개)
-
-소스 코드를 직접 확인할 수 없음.
-[hitkey BMS command memo](https://hitkey.nekokan.dyndns.info/cmds.htm) 에서 참고한
-[Guide to understand BMS format](https://cosmic.mearie.org/2005/03/bmsguide/) 을 파싱 기준으로 삼는 것으로 알려져 있음.
-
----
-
-## 3. 커맨드 지원 비교표
-
-아래 표에서 ○ = 지원, △ = 부분 지원 또는 조건부, × = 미지원, — = 확인 불가.
-
-### 메타데이터 헤더
-
-| 커맨드       | jbms-parser | bms-js | BMSE | iBMSC | μBMSC |
-| ------------ | :---------: | :----: | :--: | :---: | :---: |
-| `#TITLE`     |      ○      |   ○    |  ○   |   ○   |   ○   |
-| `#SUBTITLE`  |      ○      |   ○    |  ×   |   ○   |   ○   |
-| `#ARTIST`    |      ○      |   ○    |  ○   |   ○   |   ○   |
-| `#SUBARTIST` |      ○      |   ○    |  ×   |   ○   |   ○   |
-| `#GENRE`     |      ○      |   ○    |  ○   |   ○   |   ○   |
-| `#MAKER`     |      ×      |   ○    |  ×   |   ×   |   ×   |
-| `#COMMENT`   |  △ (stub)   |   ○    |  ○   |   ○   |   ○   |
-
-### 파일 헤더
-
-| 커맨드          | jbms-parser | bms-js | BMSE | iBMSC | μBMSC |
-| --------------- | :---------: | :----: | :--: | :---: | :---: |
-| `#WAVxx`        |      ○      |   ○    |  ○   |   ○   |   ○   |
-| `#BMPxx`        |      ○      |   ○    |  ×   |   ×   |   ○   |
-| `#STAGEFILE`    |      ○      |   ○    |  ×   |   ○   |   ○   |
-| `#BANNER`       |      ○      |   ○    |  ×   |   ○   |   ○   |
-| `#BACKBMP`      |      ○      |   ○    |  ×   |   ○   |   ○   |
-| `#PREVIEW`      |      ○      |   ○    |  ×   |   ×   |   ×   |
-| `#EXWAVxx`      |      ×      |   ○    |  ×   |   ×   |   ×   |
-| `#EXBMPxx`      |      ×      |   ○    |  ×   |   ×   |   ×   |
-| `#VIDEOFILE`    |      ×      |   ○    |  ×   |   ×   |   ×   |
-| `#MIDIFILE`     |      ×      |   △    |  ×   |   ×   |   ×   |
-| `#PATH_WAV`     |      ×      |   ×    |  ×   |   ×   |   ×   |
-| `#MATERIALSWAV` |      ×      |   ×    |  ×   |   ×   |   ×   |
-| `#MATERIALSBMP` |      ×      |   ×    |  ×   |   ×   |   ×   |
-| `#CDDA`         |      ×      |   ×    |  ×   |   ×   |   ×   |
-
-### 타이밍 헤더
-
-| 커맨드          | jbms-parser | bms-js | BMSE  | iBMSC | μBMSC |
-| --------------- | :---------: | :----: | :---: | :---: | :---: |
-| `#BPM` (초기값) |      ○      |   ○    |   ○   |   ○   |   ○   |
-| `#BPMxx`        |      ○      |   ○    |   ○   |   ○   |   ○   |
-| `#BASEBPM`      |      ×      |   ×    |   ×   |   ×   |   ×   |
-| `#STOPxx`       |      ○      |   ○    |   ○   |   ○   |   ○   |
-| `#STP`          |      ×      |   ×    |   ×   |   ×   |   ×   |
-| **`#SCROLLxx`** |    **○**    |   ×    | **○** |   ×   | **○** |
-
-### 게임플레이 헤더
-
-| 커맨드        | jbms-parser | bms-js | BMSE |     iBMSC     |  μBMSC   |
-| ------------- | :---------: | :----: | :--: | :-----------: | :------: |
-| `#PLAYER`     |      ○      |   ○    |  ○   |       ○       |    ○     |
-| `#RANK`       |      ○      |   ○    |  ○   |       ○       |    ○     |
-| `#DEFEXRANK`  |      ○      |   ○    |  ×   | △ (`#EXRANK`) |    ○     |
-| `#DIFFICULTY` |      ○      |   ○    |  ×   |       ○       |    ○     |
-| `#PLAYLEVEL`  |      ○      |   ○    |  ○   |       ○       |    ○     |
-| `#LNOBJ`      |      ○      |   ○    |  ×   |       ○       |    ○     |
-| `#LNTYPE`     |      ○      |   ×    |  ×   |   × (주석)    | × (주석) |
-
-### 게이지 / 볼륨 헤더
-
-| 커맨드    | jbms-parser | bms-js | BMSE | iBMSC | μBMSC |
-| --------- | :---------: | :----: | :--: | :---: | :---: |
-| `#TOTAL`  |      ○      |   ○    |  ×   |   ○   |   ○   |
-| `#VOLWAV` |      ○      |   ○    |  ×   |   ×   |   ×   |
-
-### 제어흐름
-
-| 커맨드           | jbms-parser | bms-js | BMSE | iBMSC | μBMSC |
-| ---------------- | :---------: | :----: | :--: | :---: | :---: |
-| `#RANDOM`        |      ○      |   ○    |  ○   |   ○   |   ○   |
-| `#SETRANDOM`     |      ○      |   ×    |  ×   |   ×   |   ×   |
-| `#IF`            |      ○      |   ○    |  ○   |   ○   |   ○   |
-| `#ELSEIF`        |      ○      |   ×    |  ×   |   ×   |   ×   |
-| `#ELSE`          |      ○      |   ×    |  ×   |   ×   |   ×   |
-| `#ENDIF`         |      ○      |   ○    |  ○   |   ○   |   ○   |
-| `#ENDRANDOM`     |      ○      |   ×    |  ×   |   ×   |   ×   |
-| `#SWITCH`        |      ○      |   ×    |  ×   |   ○   |   ○   |
-| `#SETSWITCH`     |      ×      |   ×    |  ×   |   ○   |   ○   |
-| `#ENDSW`         |      ○      |   ×    |  ×   |   ○   |   ○   |
-| `#RONDAM` (오타) |      ×      |   ×    |  ○   |   ×   |   ×   |
-
----
-
-## 4. 인코딩 처리 비교
-
-| 구현        | 인코딩 처리 방식                                                                                                  |
-| ----------- | ----------------------------------------------------------------------------------------------------------------- |
-| jbms-parser | 기본값 `MS932`. BOM → EUC-KR → MS932 → UTF-8 → UTF-16/32 순으로 64KB 표본을 시험하고 모두 실패하면 MS932          |
-| bms-js      | `bemuse-chardet` 자동 감지 + `iconv-lite` 디코딩; hitkey `#CHARSET` 알고리즘 준거; BOM 제거; `forceEncoding` 옵션 |
-| BMSE        | Windows 기본 코드페이지                                                                                           |
-| iBMSC       | `System.Text.Encoding.Default` (기본값); 설정 UI에서 변경 가능                                                    |
-| μBMSC       | `System.Text.Encoding.UTF8` (기본값); 설정 UI에서 변경 가능                                                       |
-| Qwilight    | 소스 비공개 — 확인 불가                                                                                           |
-
-`#CHARSET` 헤더를 명시적으로 파싱하는 구현은 bms-js 외에 확인되지 않음.
-
-위 표의 jbms-parser 판정 순서는 소스를 읽은 것이고, 실제 샘플에서의 거동은 근사 시험(2.1 참고 시험)만 있다.
-시험 결과는 단일 PC의 189개 표본이다.
-
----
-
-## 5. 구현 간 차이 및 주의사항
-
-### `#SCROLLxx` 지원 여부
-
-`#SCROLLxx`는 [hitkey BMS command memo](https://hitkey.nekokan.dyndns.info/cmds.htm)에
-수록되어 있지 않으나, 여러 구현에서 실제로 지원하고 있음.
-
-| 구현        | 지원 | 비고                                                         |
-| ----------- | :--: | ------------------------------------------------------------ |
-| jbms-parser |  ○   | `scrolltable: Map<Integer,Double>`, 36진수 인덱스, 음수 허용 |
-| bms-js      |  ×   | —                                                            |
-| BMSE        |  ○   | `OBJ_CH.CH_SCROLL(1020)` 채널, `Case "#SCROLL"` 분기         |
-| iBMSC       |  ×   | —                                                            |
-| μBMSC       |  ○   | `hSCROLL(1295)` 배열, 채널 `SC`                              |
-
-위 표의 bms-js ×는 파서 소스를 읽은 결과다. 한편 Bemuse에는 지원 문서와 별도로 공식 "Bemuse's BMS Extensions" 페이지가 있고,
-별도 조사(2026-10-09)가 본 검색 발췌에는 `#SCROLL01`, `#SCROLL02`, `#SPEED01`이 나온다. 본문을 열지 못했고 이 확장이 bms-js 파서에 구현돼 있는지도
-모르므로 위 표를 바꾸지 않는다(미확인, 재조사 필요). `#SPEED01`은 이 문서에 없는 이름이다.
-
-`bms.ebnf`의 `timing_header`에서 `#SCROLLxx` 반영 여부는 별도 판단이 필요함.
-복수의 주요 구현(jbms-parser, BMSE, μBMSC)에서 지원하므로 사실상 비공식 표준으로
-취급할 수 있음.
-
-### `#LNTYPE` vs `#LNOBJ`
-
-- `#LNTYPE`은 jbms-parser만 명시 지원.
-- iBMSC / μBMSC는 `#LNTYPE` 파싱 코드가 주석으로 남아 있으며,
-  대신 `#LNOBJ`가 없으면 자동으로 `#LNTYPE 1`을 출력함.
-
-### `#RONDAM` 오타 허용
-
-BMSE는 `#RANDOM`의 오타 변형인 `#RONDAM`도 처리함.
-실제 BMS 파일에 이 오타가 포함된 경우가 있음을 시사.
-
-### BPM / STOP 범위 처리
-
-- iBMSC: 0 < BPM < 65536, 상한 초과 시 내부값 `655359999`로 클램프.
-  (`655359999 = 65535.9999 × 10000` — iBMSC는 BPM을 ×10000 정수로 내부 저장하므로, 실제 BPM 상한은 65535.9999)
-- μBMSC: 범위 제한 없음 ("No limits on BPM editing").
-- jbms-parser: `#BPM` 음수는 WARNING 후 무시; `#STOP` 음수는 `Math.abs()` 적용.
-
-### `#DEFEXRANK` vs `#EXRANK`
-
-- iBMSC는 `#DEFEXRANK` 분기 없이 `#EXRANK`로 처리.
-- μBMSC는 `#DEFEXRANK`를 명시적으로 지원.
-
-### MS932(cp932)와 엄격 Shift_JIS
-
-- 위 샘플 189개에서는 두 디코딩 결과가 같았다(차이 나는 파일 0). 웨이브 대시(`0x8160`)와 NEC 13행(`0x8790`)이 샘플에 없었다.
-- 두 바이트가 나오는 샘플 밖 파일에서는 결과가 갈릴 수 있다(`0x8160`은 cp932에서 U+FF5E, JIS X 0208 Shift_JIS에서 U+301C).
-- 기본값 MS932를 정책으로 삼을 근거가 충분한지는 아직 판단하지 않았다(표본 한 개, 단일 PC).
-- 미확인: Java의 EUC-KR이 `0xA4D4`(한글 채움 문자)를 받아들이는지, 혼합 인코딩 파일, 64KB를 넘는 파일에서의 표본 판정 차이.
-
+[bmse-input]: https://github.com/Nekokan/BMSE/blob/26826aff6d51f34e0aa24284a68d9e713db6a007/modInput.vb
+[bmse-encoding]: https://github.com/Nekokan/BMSE/blob/26826aff6d51f34e0aa24284a68d9e713db6a007/modEncoding.vb
+[bemuse-compiler]: https://github.com/bemusic/bemuse/blob/4bf3e7d98a44841b323741cc403ecb7b41618ade/packages/bms/src/compiler/index.ts
+[bemuse-reader]: https://github.com/bemusic/bemuse/blob/4bf3e7d98a44841b323741cc403ecb7b41618ade/packages/bms/src/reader/index.ts
+[grammar]: bms-grammar.md
 [project-guide]: ../index.md
