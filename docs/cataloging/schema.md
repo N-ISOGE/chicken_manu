@@ -41,11 +41,11 @@
 | 알고리즘 이름이 자유 문자열이다                                                          | `VARCHAR(32)`                                                                                                                                                              | 철자를 정해야 한다. IANA 해시 이름 레지스트리는 `md5`, `sha-256`, `sha3-256`을 갖고 `blake3`는 없다. 다른 표준의 철자도 제각각이다: BagIt은 이름을 소문자·영숫자로 줄이고(`sha256`), OCFL은 `sha512`·`sha256`·`blake2b-512`, Frictionless Data Package는 `sha1:` 접두, 인터넷 아카이브는 `md5`·`sha1`·`crc32` 필드를 쓴다 |
 | 파일의 정체성은 내용 해시이고 이름이 아니다                                              | 같은 이름(`kick.wav` 등)이 여러 binder에 나온다                                                                                                                            | `(checksum_algorithm_identifier, checksum_value)`를 유일 키로 보는 것이 자연스럽다. 경로를 연결 테이블(`relative_path`)로 분리해 둔 구조는 IPFS의 콘텐츠 주소 + 경로 모델과 잘 맞는다                                                                                                                                     |
 | 패턴의 정체성은 패턴 파일의 해시다                                                       | `pattern.name`은 유일하지 않고 `pattern_file_id`가 `file`을 참조한다                                                                                                       | 난이도표의 `md5`와 `file`의 MD5를 직접 연결할 수 있다. 단 **파일 하나가 채보 하나인 포맷**(BMS 계열은 관행, osu!·bmson·KSH)에서만 성립한다. 바로 아래 행을 본다                                                                                                                                                           |
-| 파일 하나에 채보가 여럿인 포맷이 있다                                                    | StepMania `.sm`(`#NOTES` 여러 개)·`.ssc`(`#NOTEDATA` 여러 개), Clone Hero `.chart`(난이도·트랙 여러 개)([포맷별 채보 단위](crate::docs::formats::chart_units))             | 같은 파일의 채보 여럿이 같은 `pattern_file_id`를 공유하게 된다. 이 열에 유일 제약이 있는지는 설계서에서 확인하지 못했다. "파일 안의 어느 채보인가"를 가리키는 값(예: `.ssc`의 `#STEPSTYPE`+`#DIFFICULTY`+`#METER`)이 필요한지 정해야 한다                                                                                 |
+| 파일 하나에 채보가 여럿인 포맷이 있다                                                    | StepMania `.sm`(`#NOTES` 여러 개)·`.ssc`(`#NOTEDATA` 여러 개), Clone Hero `.chart`(난이도·트랙 여러 개)([포맷별 채보 단위][nav-1])                                         | 같은 파일의 채보 여럿이 같은 `pattern_file_id`를 공유하게 된다. 이 열에 유일 제약이 있는지는 설계서에서 확인하지 못했다. "파일 안의 어느 채보인가"를 가리키는 값(예: `.ssc`의 `#STEPSTYPE`+`#DIFFICULTY`+`#METER`)이 필요한지 정해야 한다                                                                                 |
 | 곡 단위 메타가 채보 파일 밖에 있는 포맷이 있다                                           | Clone Hero는 `song.ini`, Beat Saber는 `Info.dat`. osu!와 StepMania는 채보 파일마다 중복해 적는다                                                                           | `pattern`과 `binder`에는 곡 제목·아티스트 같은 곡 단위 메타를 담을 곳이 없다(`persona`와 `pattern_credits`뿐). `song.ini` 같은 파일을 `binder_appendix_file`과 `pattern_attached_file` 중 어디에 넣는지도 정해야 한다                                                                                                     |
 | `binder`에 묶음 종류와 외부 식별자가 없다                                                | 묶음이 ZIP 기반 압축 파일(`.osz`), 폴더(StepMania, Clone Hero, BMS), 단일 파일(`.adofai`)로 다르다. osu!는 `BeatmapSetID`·`BeatmapID`, Quaver API는 `package_md5`를 갖는다 | 압축 파일 자체를 `file`로 둘지 풀어서 폴더로 볼지, 외부 ID를 보관할지 정해야 한다. 압축 항목 이름의 문자 인코딩은 `.osz`를 포함해 전부 미확인이라 `relative_path`(`VARCHAR(4096)`, utf8mb4)에 항상 담긴다는 근거가 없다                                                                                                   |
 | binder에는 해시·CID가 없다                                                               | `binder(id, name)`                                                                                                                                                         | 난이도표의 `ipfs` 필드는 **디렉터리**여야 한다. IPFS로 공유하려면 binder 단위 루트 CID가 필요하다                                                                                                                                                                                                                         |
-| 원문 참조 이름이 남지 않는다                                                             | 연결 테이블은 `file_id`와 `relative_path`만 보관                                                                                                                           | `#WAV01 kick.wav`가 실제로 `kick.ogg`로 해석되는 경우(확장자 대체)와 대소문자 차이를 복원할 수 없다. [BMS 문법](crate::docs::bms_grammar)의 `file-ref-command`가 (헤더, 인덱스, 원문 경로)를 내므로 보관할지 정해야 한다                                                                                                  |
+| 원문 참조 이름이 남지 않는다                                                             | 연결 테이블은 `file_id`와 `relative_path`만 보관                                                                                                                           | `#WAV01 kick.wav`가 실제로 `kick.ogg`로 해석되는 경우(확장자 대체)와 대소문자 차이를 복원할 수 없다. [BMS 문법][nav-2]의 `file-ref-command`가 (헤더, 인덱스, 원문 경로)를 내므로 보관할지 정해야 한다                                                                                                                     |
 | `format_property`·`encoding_property`로는 BMS 텍스트를 구분하기 어렵다                   | libmagic이 BMS 내용을 인식하는지는 시험하지 않았다                                                                                                                         | 확장자와 문법 적합도(알려진 명령 비율)로 판별하는 방법이 있다                                                                                                                                                                                                                                                             |
 
 `print_file_row`가 만드는 CSV는 파일명 필드를 큰따옴표로 감싸고 내부 큰따옴표를 두 번 쓴다(RFC 4180).
@@ -68,11 +68,11 @@
 | `binder`, `pattern`                               | `structMap`의 구조 단위                                                                   |
 | `persona`, `pattern_credits`                      | `dmdSec`에 담는 기술 메타데이터(MODS 또는 Dublin Core 후보)                               |
 
-자세한 근거는 [기술 채택 판단](crate::docs::adoption)의 메타데이터 스키마 절에 있다.
+자세한 근거는 [기술 채택 판단][nav-3]의 메타데이터 스키마 절에 있다.
 
 ## 4. 다른 보존·교환 포맷과의 비교
 
-별도 조사(2026-10-09)가 모은 사실을 재배열한 것이다. 출처 링크와 확인 수준은 [참고 자료](crate::docs::references::preservation) 1절에 있고, 본문을 읽은 것은 BagIt과 OCFL뿐이다.
+별도 조사(2026-10-09)가 모은 사실을 재배열한 것이다. 출처 링크와 확인 수준은 [참고 자료][nav-4] 1절에 있고, 본문을 읽은 것은 BagIt과 OCFL뿐이다.
 이 표는 채택 판단이 아니며, 조사가 밝힌 대로 대상들은 층위가 다르다(저장 규약, 참조 모델, 목록, 식별자).
 
 | 대상                      | 메타데이터 직렬화                                                       | 해시 알고리즘                                 | 경로 규칙 요지                                                             |
@@ -91,3 +91,8 @@
 - BagIt(매니페스트와 태그 매니페스트), OCFL(인벤토리), Data Package(`datapackage.json`)는 묶음 단위 기술 파일에 파일별 다이제스트를 둔다. 이 스키마에서 `binder`에 해시·CID가 없다는 점과 대조된다.
 - 로드맵의 "METS 파생 UTF-8 XML"과 달리 RO-Crate, OCFL, Data Package는 JSON이고 BagIt은 텍스트다. XML인 쪽은 MAME 목록, DAT 계열, 인터넷 아카이브의 `_meta.xml`이다.
 - 경로의 대소문자·정규화는 BagIt(충돌 방지 권고), OCFL(대소문자 구별), SWHID(`path` 대소문자 보존)가 각자 정한다. 이 스키마의 "원문 참조 이름이 남지 않는다" 문제와 같은 종류다.
+
+[nav-1]: ../survey/formats/chart-units.md
+[nav-2]: ../survey/bms-grammar.md
+[nav-3]: ../preservation/adoption.md
+[nav-4]: ../common/references/preservation.md

@@ -1,7 +1,7 @@
 # 참고 자료: 표준과 기술
 
-메타데이터 표준, IPFS와 P2P, Rust 크레이트와 표준, 인프라와 라이선스의 링크다. 2026-10-08 조사에서 확인한 자료이고, 확인 상태는 [첫 페이지](crate)의 표기를 따른다.
-조사 중 정정된 사실은 [기술 채택 판단](crate::docs::adoption)에 있다.
+메타데이터 표준, IPFS와 P2P, Rust 크레이트와 표준, 인프라와 라이선스의 링크다. 2026-10-08 조사에서 확인한 자료이고, 확인 상태는 [공통 안내의 문서 읽는 법][nav-1]의 표기를 따른다.
+조사 중 정정된 사실은 [기술 채택 판단][nav-2]에 있다.
 
 ## 1. METS와 메타데이터
 
@@ -76,3 +76,6 @@
 | [GNU GPL v3.0](https://www.gnu.org/licenses/gpl-3.0.html)                                                                                           | 미확인 | 서버가 429를 반환해 열지 못함                       |
 | [Firebase Studio 전환 공지](https://firebase.google.com/docs/studio/idx-is-firebase-studio)                                                         | 확인   | `.idx/dev.nix`가 속한 IDX가 2027-03-22에 종료 예정  |
 | [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) · [SemVer](https://semver.org/)                                                            | 확인   | 기록 문서 형식 참고                                 |
+
+[nav-1]: ../index.md#문서-읽는-법
+[nav-2]: ../../preservation/adoption.md

@@ -1,6 +1,6 @@
 # 참고 자료: BMS 명세와 도구
 
-BMS의 명세 문서와 BMS를 읽는 구동기·파서·편집기의 링크다. 확인 상태는 [첫 페이지](crate)의 표기를 따른다(확인 / 부분 / 미확인).
+BMS의 명세 문서와 BMS를 읽는 구동기·파서·편집기의 링크다. 확인 상태는 [공통 안내의 문서 읽는 법][nav-1]의 표기를 따른다(확인 / 부분 / 미확인).
 1절의 일부 행은 별도 조사(2026-10-09)에서 옮겼다. 상태는 조사가 스스로 적은 확인 수준이고 이 저장소가 다시 확인한 값이 아니다.
 
 ## 1. BMS 명세
@@ -80,3 +80,5 @@ BMS의 명세 문서와 BMS를 읽는 구동기·파서·편집기의 링크다.
 | [bms-rs](https://github.com/MikuroXina/bms-rs) · [docs.rs](https://docs.rs/bms-rs/latest/bms_rs/) | 확인 | Apache-2.0. 1.0.0(crates.io 2026-04-18). 인코딩 감지·BOM 제거·경로 정규화 없음. 유지보수자 1~2명 |
 | [bms-table](https://docs.rs/bms-table)                                                            | 확인 | 난이도표(header.json, data.json) 파서. Apache-2.0                                                |
 | [BMS Search](https://bmssearch.net/)                                                              | 확인 | 곡 색인 사이트. API 문서는 찾지 못함                                                             |
+
+[nav-1]: ../index.md#문서-읽는-법
