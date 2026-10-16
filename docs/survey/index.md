@@ -6,9 +6,10 @@
 
 ## 1. 조사 대상 파악
 
-어떤 매체와 형식이 있는지 파악하고, 조사할 범위와 우선순위를 살펴봅니다.
+어떤 매체와 형식이 있는지 파악하고, 조사할 범위와 형식별 비교 질문을 살펴봅니다. 존재를 기록하는 발견 목록과 접근 가능한 자료에 따른 상세 조사 순서를 구별합니다.
 
 - [조사 대상 파악][formats]
+- [상용·모바일·VR 포맷 후보][commercial]
 
 ## 2. 명세와 구성 확인
 
@@ -30,6 +31,7 @@
 - [포맷별 추가 확인 사항][checks]
 - [참고 자료][references]
 
+[commercial]: formats/commercial.md
 [formats]: formats.md
 [units]: formats/chart-units.md
 [grammar]: bms-grammar.md

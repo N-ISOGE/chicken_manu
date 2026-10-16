@@ -5,6 +5,7 @@
 
 #[doc = concat!(
     "[formats]: crate::docs::survey::formats\n",
+    "[commercial]: crate::docs::survey::formats::commercial\n",
     "[units]: crate::docs::survey::formats::chart_units\n",
     "[grammar]: crate::docs::survey::bms_grammar\n",
     "[parsers]: crate::docs::survey::bms_parsers\n",
@@ -17,7 +18,7 @@ pub mod survey {
     #[doc = concat!(
         "[nav-1]: crate::docs::cataloging::schema\n",
         "[nav-2]: crate::docs::survey::bms_grammar\n",
-        "[nav-3]: crate::docs::survey::bms_grammar\n",
+        "[nav-3]: crate::docs::survey::bms_parsers\n",
         "[nav-4]: crate::docs::survey::formats::commercial\n",
         "[nav-5]: crate::docs::survey::bms_grammar\n",
         "[nav-6]: crate::docs::survey::formats::chart_units\n",
@@ -31,6 +32,7 @@ pub mod survey {
             "[nav-1]: crate::docs::survey::bms_grammar\n",
             "[nav-2]: crate::docs::cataloging::schema\n",
             "[nav-3]: crate::docs::survey::formats\n",
+            "[checks]: crate::docs::survey::formats::format_checks\n",
             "\n",
             concat!("[project-guide]: crate\n\n", include_str!("../docs/survey/formats/chart-units.md"))
         )]
@@ -38,12 +40,14 @@ pub mod survey {
 
         #[doc = concat!(
             "[nav-1]: crate::docs::survey::formats\n",
+            "[units]: crate::docs::survey::formats::chart_units\n",
+            "[checks]: crate::docs::survey::formats::format_checks\n",
             "\n",
             concat!("[project-guide]: crate\n\n", include_str!("../docs/survey/formats/commercial.md"))
         )]
         pub mod commercial {}
 
-        #[doc = concat!("[project-guide]: crate\n\n", include_str!("../docs/survey/formats/format-checks.md"))]
+        #[doc = concat!("[units]: crate::docs::survey::formats::chart_units\n[project-guide]: crate\n\n", include_str!("../docs/survey/formats/format-checks.md"))]
         pub mod format_checks {}
     }
 
@@ -51,13 +55,17 @@ pub mod survey {
         "[nav-1]: crate::docs::survey::formats\n",
         "[nav-2]: crate::docs::cataloging::schema\n",
         "[nav-3]: crate::docs::common::references::bms\n",
+        "[parsers]: crate::docs::survey::bms_parsers\n",
+        "[abnf-source]: https://github.com/N-ISOGE/chicken_manu/blob/dev/docs/survey/bms.abnf\n",
+        "[ebnf-source]: https://github.com/N-ISOGE/chicken_manu/blob/dev/docs/survey/bms.ebnf\n",
+        "[grammar-check]: https://github.com/N-ISOGE/chicken_manu/blob/dev/tools/check_bms_grammars.py\n",
         "\n",
         concat!("[project-guide]: crate\n\n", include_str!("../docs/survey/bms-grammar.md"))
     )]
-    #[doc = concat!("```abnf\n", include_str!("../docs/survey/bms.abnf"), "\n```") ]
+    #[doc = concat!("## ABNF 원문\n\n```abnf\n", include_str!("../docs/survey/bms.abnf"), "\n```") ]
     pub mod bms_grammar {}
 
-    #[doc = concat!("[project-guide]: crate\n\n", include_str!("../docs/survey/bms-parsers.md"))]
+    #[doc = concat!("[grammar]: crate::docs::survey::bms_grammar\n[project-guide]: crate\n\n", include_str!("../docs/survey/bms-parsers.md"))]
     pub mod bms_parsers {}
 }
 
@@ -102,8 +110,7 @@ pub mod preservation {
 #[doc = concat!(
     "[guide]: crate\n",
     "[references]: crate::docs::common::references\n",
-    "[notes]: crate::docs::common::notes#작업-방식\n",
-    "[lint]: crate::docs::common::notes::ci_lint\n",
+    "[notes]: crate::docs::common::notes\n",
     "\n",
     concat!("[project-guide]: crate\n\n", include_str!("../docs/common/index.md"))
 )]
@@ -145,19 +152,11 @@ pub mod common {
         "[nav-1]: crate::docs::common::changelog\n",
         "[nav-2]: crate::docs::common::references\n",
         "[nav-3]: crate::docs::survey::bms_grammar\n",
-        "[nav-4]: crate::docs::common::notes::ci_lint\n",
         "[nav-5]: crate::docs::cataloging::schema\n",
         "\n",
         concat!("[project-guide]: crate\n\n", include_str!("../docs/common/notes.md"))
     )]
-    pub mod notes {
-        #[doc = concat!(
-            "[nav-1]: crate::docs::common::notes\n",
-            "\n",
-            concat!("[project-guide]: crate\n\n", include_str!("../docs/common/notes/ci-lint.md"))
-        )]
-        pub mod ci_lint {}
-    }
+    pub mod notes {}
 
     #[doc = include_str!("../change_log.md")]
     pub mod changelog {}

@@ -14,7 +14,6 @@
     "[doc-12]: crate::docs::common::references::standards\n",
     "[doc-13]: crate::docs::common::references::charts\n",
     "[doc-14]: crate::docs::common::references::preservation\n",
-    "[doc-15]: crate::docs::common::notes::ci_lint\n",
     "[doc-16]: crate::docs::common::changelog\n",
     "[doc-17]: ../src/chicken_manu/main.rs.html\n",
     "[doc-18]: crate::docs::survey\n",

@@ -1,5 +1,5 @@
 ; =====================================================================
-; bms.abnf -- Be-Music Script (.bms .bme .bml .pms) grammar, draft 0.1
+; bms.abnf -- Be-Music Script (.bms .bme .bml .pms) grammar, draft 0.1 (notes revised 2026-10-16)
 ; chicken_manu research draft (2026-10-08). Notation: ABNF, RFC 5234.
 ; Quoted strings are case-insensitive (RFC 5234 section 2.3), which is
 ; what BMS needs: "command lines are case-insensitive" (hitkey memo).
@@ -135,13 +135,12 @@ switch-block    = ( "SWITCH " / "SETSWITCH " )
 
 ; ---------------------------------------------------------------------
 ; Appendix: what the grammar deliberately does NOT decide
-; (sources: hitkey BMS command memo 2014-07-11, section "Behavior in
-;  general implementation"; checked against 189 real files)
+; Source: hitkey BMS command memo 2014-07-11, section "Behavior in
+; general implementation". Syntax recognition is not semantic validation.
 ; ---------------------------------------------------------------------
-; 1. Encoding is not part of the language. Real files here: UTF-8 (85),
-;    CP932/Shift_JIS (96), EUC-KR (8). No BOM was present. Decode first
-;    (BOM, strict UTF-8, strict Shift_JIS, EUC-KR), then apply this
-;    grammar. Always hash the raw bytes, never the decoded text.
+; 1. Decode text before applying this grammar. Encoding detection and
+;    the priority of BOM / #CHARSET / defaults depend on the reader.
+;    Hash and retain original bytes separately from decoded text.
 ; 2. Duplicates: for the same header the line nearest EOF wins, except
 ;    #ExtChr #STP #WAVCMD #OPTION and control flow; #SUBTITLE
 ;    #SUBARTIST #COMMENT #LNOBJ may be multiple. Same channel in the same
@@ -149,9 +148,8 @@ switch-block    = ( "SWITCH " / "SETSWITCH " )
 ;    (BGM), 02 (length: last wins) and A6. Semantics, not syntax.
 ; 3. Comments (";" "//" "/* */") are an IIDXv/HDX/outliner extension and
 ;    are NOT in the original spec, so they are not in this grammar. Using
-;    them would corrupt any value that contains ";" or "//" (URLs, titles). If a reader supports them, strip them before Layer 1 (comments
-;    take precedence over control syntax). None of the 189 sample files
-;    has ";" "//" or "/*" inside a "#" line.
+;    them blindly can corrupt values such as URLs. A reader supporting
+;    this extension needs its own preprocessing and value rules.
 ; 4. Separator: the spec uses one space. Tab and runs of white space are
 ;    accepted here (header-sep = 1*WSP); an omitted separator after a
 ;    name is accepted only as an empty value.
@@ -159,15 +157,11 @@ switch-block    = ( "SWITCH " / "SETSWITCH " )
 ;    only. "#BASE 62" exists in beatoraja/jbms-parser but is not in the
 ;    hitkey memo; this grammar does not model it (idx36 would have to
 ;    become idx62, case-sensitive).
-; 6. Not in hitkey but present in the sample files and accepted:
-;    #PREVIEW (13 files) and #LNMODE (13 files), plus the typo
-;    #SUBARTHIST (2 files, falls to generic-command).
-; 7. Real-world noise: "#TOTAL stand by OK" (a non-number in a numeric
-;    header) is accepted by source-line but rejected by
-;    known-command-line; "#05302:.25" (no leading zero) is accepted;
-;    macOS AppleDouble files "._name.bms" are NOT BMS and must be
-;    skipped by name before parsing; '*' ruler lines and '%URL' lines
-;    are ignored text; #RANDOM blocks without #ENDRANDOM occur.
+; 6. Known extension names include #PREVIEW and #LNMODE. Unknown names
+;    are retained by generic-command without claiming semantic support.
+; 7. #TOTAL with a nonnumeric value is accepted by source-line but rejected
+;    by known-command-line. #05302:.25 is accepted. Container metadata
+;    files must be identified separately, rather than by extension alone.
 ; 8. Channel 02 uses a decimal, channel 03 a 2-digit HEX integer BPM;
 ;    channel 08 (extended BPM) and 09 (STOP) use 2-char indexes into
 ;    #BPMxx / #STOPxx, so they are ordinary object channels here.

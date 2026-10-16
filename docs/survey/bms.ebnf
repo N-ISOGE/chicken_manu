@@ -1,3 +1,11 @@
+(* Project grammar draft, revision 2026-10-16. Not an official BMS spec. *)
+(* This EBNF describes selected known commands; it is not a mechanical  *)
+(* translation of bms.abnf. Literals are case-sensitive: command names  *)
+(* below use uppercase, while header values and paths keep their case. *)
+(* Input is decoded text. Append one LF for recognition if the input   *)
+(* has no final CR/LF; keep original bytes separately. Encoding choice  *)
+(* is outside the grammar. See bms-grammar.md for scope and tests.      *)
+
 (* ================================================================== *)
 (* BMS (Be-Music Script) File Format — EBNF Grammar Specification     *)
 (* ================================================================== *)
@@ -52,16 +60,16 @@
 (*                                                                    *)
 (* 이 EBNF는 CCS(코드 포인트) 레벨에서 정의된다.                     *)
 (* CEF + CES = CM 에 해당하는 바이트↔코드포인트 변환은               *)
-(* 파서가 문법 외부에서 수행하며, 아래 우선순위로 CM을 결정한다:     *)
+(* 파서가 문법 외부에서 수행하며, 대상 구현의 선택 규칙을 확인한다:   *)
 (*                                                                    *)
-(*   1. #CHARSET 헤더 값을 IANA charset 이름으로 해석 (CM 지정)      *)
+(*   BOM·#CHARSET·기본값의 우선순위는 대상 구현에서 따로 확인한다.    *)
 (*      예: #CHARSET UTF-8  →  UTF-8 Character Map 적용              *)
 (*      예: #CHARSET Shift_JIS  →  Shift_JIS Character Map 적용      *)
-(*   2. 파일 선두 BOM(Byte Order Mark) 감지 (아래 표 참조)           *)
-(*   3. 위 두 단서가 모두 없으면 구현 의존                           *)
+(*   아래 표는 BOM의 바이트 표현이며 파서 정책을 정하지 않는다.      *)
+(*   인코딩의 자동 판별·강제 지정·재읽기는 이 문법 밖의 처리다.      *)
 (*      (역사적으로 일본 BMS는 Shift_JIS, 한국 BMS는 EUC-KR/UTF-8)  *)
 (*                                                                    *)
-(* BOM 감지 우선순위 (W3C XML 1.1 §4.3.3 / UTR#17 §2.5 준거):       *)
+(* BOM 바이트의 예 (이 표는 BMS 인코딩 선택 순서를 규정하지 않음):    *)
 (*   ┌─────────────────┬───────────────────────────────────────┐    *)
 (*   │ 선두 바이트     │ 결정 인코딩                           │    *)
 (*   ├─────────────────┼───────────────────────────────────────┤    *)
@@ -216,15 +224,9 @@ LINE_CHAR        ::= CP_HT               (* U+0009 *)
                    | PRINTABLE_ASCII     (* U+0020–U+007E *)
                    | NONASCII           (* U+0080– (서로게이트 제외) *)
 
-(* --- PATH_CHAR: 파일 경로를 구성하는 코드 포인트 ---------------  *)
-(*     공백(CP_SP), 탭(CP_HT), 줄바꿈(CP_LF, CP_CR)을 제외          *)
-(*     비ASCII 경로(한글·일본어 디렉터리 이름 등) 허용               *)
-(*     = CP_ASCII_PRINT | NONASCII                                   *)
-(*     주의: OS/FS 금지 문자(Win32: \ / : * ? " < > |)는            *)
-(*           이 문법 외부에서 별도로 제약한다                        *)
-
-PATH_CHAR        ::= CP_ASCII_PRINT      (* U+0021–U+007E *)
-                   | NONASCII           (* U+0080– (서로게이트 제외) *)
+(* --- PATH_CHAR: 줄 구분자를 제외한 원문 경로 문자 ---------------- *)
+(* 공백이 있는 경로도 보존하며 trim·경로 해석은 의미 처리에서 다룬다. *)
+PATH_CHAR        ::= LINE_CHAR
 
 
 (* ================================================================== *)
@@ -250,17 +252,17 @@ EOF              ::= (* end of input *)
 quoted_text      ::= LINE_CHAR*
                      (* CCS(코드 포인트) 레벨에서 줄바꿈 제외 전체 허용 *)
                      (* [글자 계층] 구현 권장:                         *)
-                     (*   UTF-8 텍스트는 NFC 정규화 권장 (Unicode §3.11)*)
-                     (*   Shift_JIS / EUC-KR 텍스트는 CM 변환 후 NFC   *)
+                     (*   표시·검색용 정규화는 원문 보존과 별도로 처리한다 *)
+                     (*   원본 바이트와 디코딩 결과를 구별해 보존한다    *)
 
 file_path        ::= PATH_CHAR+
-                     (* 공백·탭·줄바꿈을 제외한 경로 구성 문자        *)
+                     (* 줄바꿈을 제외한 원문 경로 문자        *)
                      (* 비ASCII 경로(한글·일본어 디렉터리 등) 허용;   *)
-                     (* 구현 호환성을 위해 ASCII 경로를 권장한다       *)
+                     (* 대상 구현·파일시스템의 제약은 별도로 확인한다       *)
 
 unsigned_integer ::= DIGIT+
                      (* 음수 부호 없는 비음 정수 — BMS 파라미터 대부분이 해당 *)
-unsigned_decimal ::= DIGIT+ ( '.' DIGIT+ )?
+unsigned_decimal ::= DIGIT+ ( '.' DIGIT* )? | '.' DIGIT+
                      (* 음수 부호 없는 비음 소수                       *)
 integer          ::= '-'? unsigned_integer
                      (* 부호 있는 정수 — 음수를 허용하는 파라미터 전용 *)
@@ -280,7 +282,7 @@ stp_position     ::= DIGIT DIGIT DIGIT '.' DIGIT DIGIT DIGIT
 (*    세 가지 형식: "//" 행주석, ";" 행주석, "/* */" 블록주석         *)
 (* ================================================================== *)
 
-line_comment     ::= ( '//' | ';' ) LINE_CHAR* NL
+line_comment     ::= ( '//' | ';' ) LINE_CHAR*
                      (* 행 끝까지 임의의 코드 포인트 허용              *)
 block_comment    ::= '/*' ( LINE_CHAR | NL )* '*/'
                      (* 블록 안에서 줄바꿈과 비ASCII 코드 포인트 허용  *)
@@ -292,33 +294,16 @@ comment          ::= line_comment | block_comment
 (*    bms_file → bms_line*                                            *)
 (* ================================================================== *)
 
-bms_file         ::= ( bms_line | NL )* EOF
-bms_line         ::= WSP* ( control_flow_stmt
-                           | channel_stmt
-                           | header_stmt
-                           | seed_stmt
-                           | comment
-                           | non_command_line ) NL?
+bms_file         ::= ( bms_line | WSP* NL )* EOF
+bms_line         ::= WSP* ( control_flow_stmt | seed_stmt | simple_content NL )
+simple_bms_line  ::= WSP* simple_content NL
+simple_content   ::= channel_stmt | header_stmt | comment | non_command_line
 
-(* 제어흐름 구문을 포함하지 않는 단순 행 —                           *)
-(* #RANDOM / #SWITCH 블록 내부에서 사용하여 중첩을 방지한다.         *)
-(* control_flow_stmt(= random_block | switch_block | if_block)는     *)
-(* random_body / case_clause / def_clause 에서 허용하지 않는다.      *)
-simple_bms_line  ::= WSP* ( channel_stmt
-                           | header_stmt
-                           | seed_stmt
-                           | comment
-                           | non_command_line ) NL?
-
-(* '#'으로 시작하지 않는 행 — 주석 또는 무시 대상; 비ASCII 허용      *)
-(* 첫 문자가 '#'(U+0023)이 아닌 LINE_CHAR, 이후는 임의의 LINE_CHAR  *)
-non_command_line ::= ( CP_HT
-                     | CP_SP
-                     | NONASCII
-                     | [#x0021-#x0022]       (* '!' '\"' *)
-                     | [#x0024-#x007E]       (* '$'–'~', '#'(#x23) 제외 *)
+(* '#'로 시작하는 잘못된 명령을 무시 줄로 우회 수용하지 않는다.      *)
+non_command_line ::= ( NONASCII
+                     | [#x0021-#x0022]
+                     | [#x0024-#x007E]
                      ) LINE_CHAR*
-
 
 (* ================================================================== *)
 (* §4. 인덱스 표기                                                    *)
@@ -345,7 +330,7 @@ header_stmt      ::= '#' ( metadata_header
 
 (* --- §5-1. 메타데이터 -------------------------------------------  *)
 (*     quoted_text 필드는 CCS(코드 포인트) 레벨에서 임의의 문자 허용 *)
-(*     실제 인코딩(CM)은 #CHARSET 헤더 또는 BOM으로 결정             *)
+(*     인코딩 선택 정책은 이 문법의 범위 밖이다                      *)
 
 metadata_header
   ::= 'TITLE'        WSP+ quoted_text
@@ -358,7 +343,7 @@ metadata_header
       (* 구현에 따라 "..." 인용 형식도 허용; quoted_text는 양쪽 모두 포함 *)
     | 'CHARSET'      WSP+ charset_name
       (* CM 결정에 사용되는 IANA charset 이름                         *)
-      (* 이 헤더가 나타나면 파서는 전체 파일을 해당 CM으로 재해석한다 *)
+      (* 대상 구현이 이 선언을 사용하는지는 별도로 확인한다          *)
       (* 위치 제약: 파일 선두 부근에 위치시키는 것을 강력히 권장      *)
 
 (* --- §5-2. 파일 참조 --------------------------------------------  *)
@@ -462,7 +447,7 @@ control_flow_stmt
 random_block     ::= '#RANDOM'    WSP+ unsigned_integer NL
                      (* 난수 범위: 양의 정수 *)
                       random_body
-                      '#ENDRANDOM' NL?
+                      ( '#ENDRANDOM' NL )?
 
 random_body      ::= ( if_block | simple_bms_line | NL )*
                      (* if_block 만 허용; random_block / switch_block 중첩 불가 *)
@@ -473,7 +458,7 @@ if_block         ::= '#IF'        WSP+ unsigned_integer NL
                       ( bms_line | NL )*
                       ( '#ELSEIF'  WSP+ unsigned_integer NL ( bms_line | NL )* )*
                       ( '#ELSE'    NL ( bms_line | NL )* )?
-                      '#ENDIF'     NL?
+                      '#ENDIF'     NL
 
 if_block_standalone ::= if_block
 
@@ -482,7 +467,7 @@ if_block_standalone ::= if_block
 switch_block     ::= '#SWITCH'    WSP+ unsigned_integer NL
                      (* 분기 범위: 양의 정수 *)
                       switch_body
-                      '#ENDSW'     NL?
+                      '#ENDSW'     NL
 
 switch_body      ::= ( case_clause | def_clause | NL )*
 
@@ -510,18 +495,18 @@ seed_stmt        ::= '#SETRANDOM'  WSP+ unsigned_integer NL
 (*    data = 오브젝트 배열 (인덱스 쌍의 나열)                        *)
 (* ================================================================== *)
 
-channel_stmt     ::= '#' measure_num WSP* channel_id WSP* ':' WSP* channel_data
+channel_stmt     ::= '#' measure_num ( '02' ':' measure_length
+                                    | '03' ':' bpm_array
+                                    | object_channel_id ':' object_array )
+measure_num      ::= DIGIT DIGIT DIGIT
+object_channel_id ::= '0' ( '0' | '1' | [#x0034-#x0039]
+                          | ASCII_UPPER | ASCII_LOWER )
+                    | ( [#x0031-#x0039] | ASCII_UPPER | ASCII_LOWER ) BASE36_DIGIT
 
-measure_num      ::= DIGIT DIGIT DIGIT   (* 000 ~ 999 *)
-channel_id       ::= BASE36_DIGIT BASE36_DIGIT
-
-(* --- §7-1. 채널 데이터 형식 ------------------------------------  *)
-
-channel_data     ::= object_array        (* 대부분의 채널 *)
-                   | measure_length      (* 채널 02 전용  *)
-
-object_array     ::= index+              (* 총 길이 ÷ 2 = 오브젝트 수 *)
-measure_length   ::= unsigned_decimal    (* 채널 02: 마디 길이 배수; 의미상 0보다 커야 함 *)
+(* 02의 소수, 03의 16진수 쌍, 나머지 채널의 base36 쌍을 분리한다.     *)
+object_array     ::= index*
+bpm_array        ::= ( HEX_DIGIT HEX_DIGIT )*
+measure_length   ::= unsigned_decimal
 
 (* --- §7-2. 주요 채널 번호 일람 ---------------------------------  *)
 (* 01     BGM (배경음; 다중 선언 가능)                               *)
